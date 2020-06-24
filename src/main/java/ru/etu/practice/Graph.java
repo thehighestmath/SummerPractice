@@ -163,7 +163,10 @@ public class Graph {
     public void kraskal() {
         for (Edge edge : inputEdges) {
             State state = nextStep(edge);
-            System.err.println(state);;
+            System.err.println(state);
+            if (state == State.END) {
+                break;
+            }
         }
     }
 
