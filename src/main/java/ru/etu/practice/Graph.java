@@ -80,7 +80,6 @@ public class Graph {
                 inputGraph[to - 'a'][from - 'a'] = distance;
             }
         }
-
         countVertexes = inputVertices.size();
     }
 
@@ -114,52 +113,60 @@ public class Graph {
                 return Integer.compare(distance1, distance2);
             }
         });
+        System.err.println(State.SORT);
     }
 
+    private State nextStep(Edge edge) {
+        State state = null;
+        Set<Character> tempVertexes = new HashSet<>();
+        Character vertex1 = edge.from;
+        Character vertex2 = edge.to;
+        tempVertexes.add(vertex1);
+        tempVertexes.add(vertex2);
+
+        boolean hasFound = false;
+        for (Set<Character> currently : outputVertices) {
+            if (isOld(currently, tempVertexes)) {
+                return State.LOOP;
+            }
+            if (isCommon(currently, tempVertexes)) {
+                hasFound = true;
+                currently.addAll(tempVertexes);
+                state = State.APPEND;
+            }
+        }
+
+        for (int i = 0; i < outputVertices.size(); i++) {
+            for (int j = i + 1; j < outputVertices.size(); j++) {
+                Set<Character> first = outputVertices.get(i);
+                Set<Character> second = outputVertices.get(j);
+                if (isCommon(first, second)) {
+                    state = State.CONNECT_COMPONENTS;
+                    first.addAll(second);
+                    second.clear();
+                }
+            }
+        }
+
+        outputEdges.add(edge);
+        if (!hasFound) {
+            state = State.NEW_COMPONENT;
+            outputVertices.add(tempVertexes);
+        }
+        if (outputVertices.get(0).size() == countVertexes) {
+            state = State.END;
+        }
+//        assert state != null;
+        return state;
+    }
 
     public void kraskal() {
         for (Edge edge : inputEdges) {
-            Set<Character> tempVertexes = new HashSet<>();
-            Character vertex1 = edge.from;
-            Character vertex2 = edge.to;
-            tempVertexes.add(vertex1);
-            tempVertexes.add(vertex2);
-
-            boolean hasFound = false;
-            boolean oldEdge = false;
-            for (Set<Character> currently : outputVertices) {
-                if (isOld(currently, tempVertexes)){
-                    oldEdge = true;
-                    break;
-                }
-                if (isCommon(currently, tempVertexes)) {
-                    hasFound = true;
-                    currently.addAll(tempVertexes);
-                }
-            }
-            if (oldEdge){
-                continue;
-            }
-            for (int i = 0; i < outputVertices.size(); i++) {
-                for (int j = i + 1; j < outputVertices.size(); j++) {
-                    Set<Character> first = outputVertices.get(i);
-                    Set<Character> second = outputVertices.get(j);
-                    if (isCommon(first, second)) {
-                        System.out.println(true);
-                        first.addAll(second);
-                        second.clear();
-                    }
-                }
-            }
-            outputEdges.add(edge);
-            if (!hasFound) {
-                outputVertices.add(tempVertexes);
-            }
-            // FIXME: НЕ очень наивное условие
-            if (outputVertices.get(0).size() == countVertexes) {
+            State state = nextStep(edge);
+            System.err.println(state);
+            if (state == State.END) {
                 break;
             }
-
         }
     }
 
