@@ -66,7 +66,7 @@ public class Graph {
     }
 
     public void initGraph(List<Edge> inputEdges, List<Character> inputVertices){
-        this.inputEdges = inputEdges;
+        this.inputEdges = new LinkedList<>(inputEdges);
         this.inputVertices = new HashSet<>(inputVertices);
     }
 
