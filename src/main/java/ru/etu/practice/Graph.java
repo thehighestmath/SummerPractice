@@ -16,6 +16,28 @@ class Edge {
         this.distance = distance;
 
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        Edge other = (Edge) o;
+        if (this.to == other.to && this.from == other.from ||
+                this.from == other.to && this.to == other.from
+        ) {
+            return true;
+        }
+        return false;
+    }
 }
 
 public class Graph {
@@ -27,10 +49,10 @@ public class Graph {
     private final int[][] outputGraph;
 
 
-    private final List<Edge> inputEdges;
+    private List<Edge> inputEdges;
     private final List<Edge> outputEdges;
 
-    private final Set<Character> inputVertices;
+    private Set<Character> inputVertices;
     private final List<Set<Character>> outputVertices;
 
 
@@ -41,6 +63,11 @@ public class Graph {
         outputEdges = new LinkedList<>();
         inputVertices = new HashSet<>();
         outputVertices = new LinkedList<>();
+    }
+
+    public void initGraph(List<Edge> inputEdges, List<Character> inputVertices){
+        this.inputEdges = inputEdges;
+        this.inputVertices = new HashSet<>(inputVertices);
     }
 
     public void readGraph() {
@@ -161,6 +188,7 @@ public class Graph {
     }
 
     public void kraskal() {
+        sortEdges();
         for (Edge edge : inputEdges) {
             State state = nextStep(edge);
             System.err.println(state);

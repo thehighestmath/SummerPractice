@@ -13,9 +13,16 @@ public class MyJComponent extends JComponent {
     private final static float RADIUS = 40f;
     private final List<Ellipse2D> vertexes = new LinkedList<>();
     private final List<Line2D> edges = new LinkedList<>();
+
     private Ellipse2D vertex = null;
     private Line2D edge = null;
     private static char name = 'a';
+    private MainWindow mainWindow;
+
+    public MyJComponent(MainWindow mainWindow) {
+        super();
+        this.mainWindow = mainWindow;
+    }
 
     public List<Ellipse2D> getVertexes() {
         return vertexes;
@@ -62,7 +69,7 @@ public class MyJComponent extends JComponent {
 
     };
 
-    public void clearLastEdge(){
+    public void clearLastEdge() {
         edges.remove(edges.size() - 1);
         repaint();
     }
@@ -77,15 +84,25 @@ public class MyJComponent extends JComponent {
         // размер шрифта
         g2d.setFont(new Font("TimesNewRoman", Font.BOLD, 18));
 
-        for (Shape shape : edges) {
-            g2d.draw(shape);
+        List<Edge> outEdges = mainWindow.getOutEdges();
+        int i = 0;
+        for (Line2D edge : edges) {
+            g2d.draw(edge);
+            if (outEdges.size() > i) {
+                Edge outEdge = outEdges.get(i++);
+                g2d.drawString(
+                        String.valueOf(outEdge.distance),
+                        (float) (0.5 * (edge.getX1() + edge.getX2()) - 20),
+                        (float) (0.5 * (edge.getY1() + edge.getY2()) - 20)
+                );
+            }
         }
 
         char name = 'a';
-        for (Shape shape : vertexes) {
-            g2d.draw(shape);
-            int x = shape.getBounds().x;
-            int y = shape.getBounds().y;
+        for (Ellipse2D vertex : vertexes) {
+            g2d.draw(vertex);
+            int x = vertex.getBounds().x;
+            int y = vertex.getBounds().y;
 
             g2d.drawString(String.valueOf(name++), x + 15, y + 25);
         }
