@@ -3,6 +3,10 @@ package ru.etu.practice;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 public class MainWindow extends JFrame
         implements MouseListener, MouseMotionListener, ItemListener, ActionListener {
@@ -55,7 +59,7 @@ public class MainWindow extends JFrame
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
         if (vertexes.isSelected()) {
-            graph.mouseAdapter.mouseClicked(mouseEvent);
+            graph.addVertex.mouseClicked(mouseEvent);
         } else if (edged.isSelected()) {
 
         } else {
@@ -65,13 +69,59 @@ public class MainWindow extends JFrame
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
-
+        if (edged.isSelected()) {
+            List<Ellipse2D> vertexes = graph.getVertexes();
+            boolean hasFound = false;
+            for (Ellipse2D vertex : vertexes) {
+                if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
+                    hasFound = true;
+                    graph.addEdge.mousePressed(mouseEvent);
+                    break;
+                }
+            }
+            if (!hasFound) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Кажется, что Вы не попали в область вершины, попробуйте ещё раз",
+                        "Сообщение",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent mouseEvent) {
-
+        if (edged.isSelected()) {
+            List<Ellipse2D> vertexes = graph.getVertexes();
+            boolean hasFound = false;
+            for (Ellipse2D vertex : vertexes) {
+                if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
+                    hasFound = true;
+                    graph.addEdge.mouseReleased(mouseEvent);
+                    break;
+                }
+            }
+            if (!hasFound) {
+                graph.clearLastEdge();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Кажется, что Вы не попали в область вершины, попробуйте ещё раз",
+                        "Сообщение",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
     }
+
+
+    @Override
+    public void mouseDragged(MouseEvent mouseEvent) {
+        if (edged.isSelected()) {
+            graph.addEdge.mouseDragged(mouseEvent);
+        }
+    }
+
 
     @Override
     public void mouseEntered(MouseEvent mouseEvent) {
@@ -80,11 +130,6 @@ public class MainWindow extends JFrame
 
     @Override
     public void mouseExited(MouseEvent mouseEvent) {
-
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent mouseEvent) {
 
     }
 
