@@ -112,11 +112,11 @@ public class MainWindow extends JFrame
         }
     }
 
-    private void setEdge(List<Edge> edges){
+    private void setEdge(List<Edge> edges) {
         String result = JOptionPane.showInputDialog(
                 this,
                 "<html><h2>Введите вес ребра");
-        if (result.matches("\\d+")){
+        if (result.matches("\\d+")) {
             int distance = Integer.parseInt(result);
             Edge edge = new Edge(fromVertex, toVertex, distance);
             edges.add(edge);
@@ -128,7 +128,6 @@ public class MainWindow extends JFrame
         if (edged.isSelected()) {
             List<Ellipse2D> vertexes = graph.getVertexes();
             boolean hasFound = false;
-            boolean idOld = false;
             char i = 0;
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
@@ -201,11 +200,41 @@ public class MainWindow extends JFrame
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if (actionEvent.getSource() == allSteps){
+        if (actionEvent.getSource() == allSteps) {
             Graph graph = new Graph();
             graph.initGraph(outEdges, outVertexes);
             graph.kraskal();
-            graph.printResult();
+            List<Edge> outEdges = graph.getOutputEdges();
+            List<Ellipse2D> vertexes = this.graph.getVertexes();
+            List<Line2D> lines2D = new LinkedList<>();
+            for (Edge edge : outEdges) {
+                char from = edge.from;
+                char to = edge.to;
+                double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+                char i = 0;
+                for (Ellipse2D vertex : vertexes) {
+                    Rectangle2D rectangle2D = vertex.getBounds2D();
+                    double x = rectangle2D.getCenterX();
+                    double y = rectangle2D.getCenterY();
+                    if (from == (char) ('a' + i)) {
+                        x1 = x;
+                        y1 = y;
+                    } else if (to == (char) ('a' + i)) {
+                        x2 = x;
+                        y2 = y;
+                    }
+                    i++;
+                }
+                Point2D pointFrom = new Point2D.Double(x1, y1);
+                Point2D pointTo = new Point2D.Double(x2, y2);
+                Line2D line2D = new Line2D.Double(
+                        pointFrom, pointTo
+                );
+                lines2D.add(line2D);
+            }
+
+            this.graph.resultEdges = new LinkedList<>(lines2D);
+            this.graph.repaint();
         }
     }
 }

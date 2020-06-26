@@ -13,6 +13,7 @@ public class MyJComponent extends JComponent {
     private final static float RADIUS = 40f;
     private final List<Ellipse2D> vertexes = new LinkedList<>();
     private final List<Line2D> edges = new LinkedList<>();
+    public List<Line2D> resultEdges = new LinkedList<>();
 
     private Ellipse2D vertex = null;
     private Line2D edge = null;
@@ -107,6 +108,13 @@ public class MyJComponent extends JComponent {
             g2d.drawString(String.valueOf(name++), x + 15, y + 25);
         }
 
+        g2d.setPaint(Color.BLUE);
 
+        // толщина линии
+        g2d.setStroke(new BasicStroke(5));
+
+        for (Line2D edge : resultEdges) {
+            g2d.draw(edge);
+        }
     }
 }

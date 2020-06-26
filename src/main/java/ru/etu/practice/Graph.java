@@ -143,6 +143,10 @@ public class Graph {
         System.err.println(State.SORT);
     }
 
+    public List<Edge> getOutputEdges() {
+        return outputEdges;
+    }
+
     private State nextStep(Edge edge) {
         State state = null;
         Set<Character> tempVertexes = new HashSet<>();
