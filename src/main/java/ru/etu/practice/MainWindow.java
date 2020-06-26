@@ -94,7 +94,10 @@ public class MainWindow extends JFrame
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     hasFound = true;
-                    graph.addEdge.mousePressed(mouseEvent);
+                    graph.setEdge(
+                            vertex.getBounds().getCenterX(),
+                            vertex.getBounds().getCenterY()
+                    );
                     break;
                 }
                 i++;
@@ -132,7 +135,10 @@ public class MainWindow extends JFrame
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     hasFound = true;
-                    graph.addEdge.mouseReleased(mouseEvent);
+                    graph.releasedEdge(
+                            vertex.getBounds().getCenterX(),
+                            vertex.getBounds().getCenterY()
+                    );
                     break;
                 }
                 i++;
@@ -173,7 +179,7 @@ public class MainWindow extends JFrame
     @Override
     public void mouseDragged(MouseEvent mouseEvent) {
         if (edged.isSelected()) {
-            graph.addEdge.mouseDragged(mouseEvent);
+            graph.continueEdge(mouseEvent);
         }
     }
 
