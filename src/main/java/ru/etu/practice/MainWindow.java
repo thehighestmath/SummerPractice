@@ -144,6 +144,7 @@ public class MainWindow extends JFrame
                 this,
                 "<html><h2>Введите вес ребра");
         if (result.matches("\\d+")) {
+            System.out.println(result);
             int distance = Integer.parseInt(result);
             Edge edge = new Edge(fromVertex, toVertex, distance);
             edges.add(edge);
@@ -151,19 +152,23 @@ public class MainWindow extends JFrame
     }
 
     @Override
-    public void mouseReleased(MouseEvent mouseEvent) {// добавление проверки на то что концы ребра пренадлежат разным вершина
+    public void mouseReleased(MouseEvent mouseEvent) {
         if (edged.isSelected()) {
             List<Ellipse2D> vertexes = graph.getVertexes();
             boolean hasFound = false;
             char i = 0;
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
-                    hasFound =
-                            graph.releasedEdge(
-                                    vertex.getBounds().getCenterX(),
-                                    vertex.getBounds().getCenterY()
-                            );
-                    break;
+                    hasFound = true;
+                    if (!graph.releasedEdge( vertex.getBounds().getCenterX(), vertex.getBounds().getCenterY())) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "Появление петель не возможно.",
+                                "Сообщение",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
                 }
                 i++;
             }
