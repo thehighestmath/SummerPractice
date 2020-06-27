@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class MyJComponent extends JComponent {
     private final static float RADIUS = 40f;
@@ -83,7 +84,22 @@ public class MyJComponent extends JComponent {
         vertex = chosenVertex;
     }
 
-    public void moveVertex(MouseEvent mouseEvent) {
+    public void moveVertex(MouseEvent mouseEvent) {// нужна проверка на принадлежность ребра к вершине,
+        for(Line2D line : edges) {                 //  иначе возможен захват лишних ребер
+            if (vertex.getBounds2D().contains(line.getP1())) {
+                line.setLine(mouseEvent.getPoint(), line.getP2());
+            }else if (vertex.getBounds2D().contains(line.getP2())) {
+                line.setLine(line.getP1(), mouseEvent.getPoint());
+            }
+        }
+
+        for(Line2D line : resultEdges) {
+            if (vertex.getBounds2D().contains(line.getP1())) {
+                line.setLine(mouseEvent.getPoint(), line.getP2());
+            }else if (vertex.getBounds2D().contains(line.getP2())) {
+                line.setLine(line.getP1(), mouseEvent.getPoint());
+            }
+        }
         vertex.setFrame(mouseEvent.getX() - RADIUS / 2, mouseEvent.getY() - RADIUS / 2, RADIUS, RADIUS);
         repaint();
     }

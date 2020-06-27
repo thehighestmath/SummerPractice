@@ -127,15 +127,15 @@ public class MainWindow extends JFrame
                 );
             }
         } else if (moveVertex.isSelected()) { // переместить это в стягивание вершин. Требуется пояснение для изменения
-            Ellipse2D movedVertex;
             List<Ellipse2D> vertexes = graph.getVertexes();
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
-                    movedVertex = vertex;
-                    graph.chooseMovableVertex(movedVertex);
+                    graph.chooseMovableVertex(vertex);
                     break;
                 }
             }
+
+
         }
     }
 
@@ -144,7 +144,6 @@ public class MainWindow extends JFrame
                 this,
                 "<html><h2>Введите вес ребра");
         if (result.matches("\\d+")) {
-            System.out.println(result);
             int distance = Integer.parseInt(result);
             Edge edge = new Edge(fromVertex, toVertex, distance);
             edges.add(edge);
@@ -160,15 +159,16 @@ public class MainWindow extends JFrame
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     hasFound = true;
-                    if (!graph.releasedEdge( vertex.getBounds().getCenterX(), vertex.getBounds().getCenterY())) {
+                    if (!graph.releasedEdge(vertex.getBounds().getCenterX(), vertex.getBounds().getCenterY())) {
                         JOptionPane.showMessageDialog(
                                 this,
-                                "Появление петель не возможно.",
+                                "Ввод петель не возможен.",
                                 "Сообщение",
                                 JOptionPane.ERROR_MESSAGE
                         );
                         return;
                     }
+                    break;
                 }
                 i++;
             }
