@@ -76,6 +76,15 @@ public class MyJComponent extends JComponent {
         repaint();
     }
 
+    public void chooseMovebleVertex(Ellipse2D choosenVertex) {
+        vertex = choosenVertex;
+    }
+
+    public void moveVertex(MouseEvent mouseEvent) {
+        vertex.setFrame(mouseEvent.getX() - RADIUS/2, mouseEvent.getY() - RADIUS/2, RADIUS, RADIUS);
+        repaint();
+    }
+
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setPaint(Color.BLACK);

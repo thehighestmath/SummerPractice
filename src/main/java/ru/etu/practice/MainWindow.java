@@ -40,6 +40,7 @@ public class MainWindow extends JFrame
 
     JRadioButton vertexes = new JRadioButton("Ввод вершин", true);
     JRadioButton edged = new JRadioButton("Стягивание вершин");
+    JRadioButton moveVertex = new JRadioButton("переместить вершину");
 
     ButtonGroup type = new ButtonGroup();
 
@@ -51,18 +52,21 @@ public class MainWindow extends JFrame
         add(panel);
         type.add(vertexes);
         type.add(edged);
+        type.add(moveVertex);
         panel.setLayout(new BorderLayout());
 
         grid.add(step, BorderLayout.NORTH);
         grid.add(vertexes, BorderLayout.NORTH);
         grid.add(allSteps, BorderLayout.NORTH);
         grid.add(edged, BorderLayout.NORTH);
+        grid.add(moveVertex, BorderLayout.EAST);
 
         vertexes.addItemListener(this);
         edged.addItemListener(this);
 
         step.addActionListener(this);
         allSteps.addActionListener(this);
+        moveVertex.addActionListener(this);
 
         container.add("North", grid);
         container.add("Center", graph);
@@ -76,8 +80,20 @@ public class MainWindow extends JFrame
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
         if (vertexes.isSelected()) {
-            graph.addVertex.mouseClicked(mouseEvent);
-            outVertexes.add(vertex++);
+            boolean emptyArea = true;
+            List<Ellipse2D> vertexes = graph.getVertexes();
+            for(Ellipse2D vertex : vertexes) {
+                if(vertex.getBounds2D().contains(mouseEvent.getPoint()))
+                {
+                    emptyArea = false;
+                    break;
+                }
+            }
+            if(emptyArea)
+            {
+                graph.addVertex.mouseClicked(mouseEvent);
+                outVertexes.add(vertex++);
+            }
         } else if (edged.isSelected()) {
 
         } else {
@@ -112,8 +128,18 @@ public class MainWindow extends JFrame
                         JOptionPane.ERROR_MESSAGE
                 );
             }
+        } else if(moveVertex.isSelected()) { // переместить это в стягивание вершин. Требуется пояснение для изменения
+            Ellipse2D movedVertex;
+            List<Ellipse2D> vertexes = graph.getVertexes();
+            for (Ellipse2D vertex : vertexes) {
+                if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
+                    movedVertex = vertex;
+                    graph.chooseMovebleVertex(movedVertex);
+                    break;
+                }
+            }
         }
-    }
+        }
 
     private void setEdge(List<Edge> edges) {
         String result = JOptionPane.showInputDialog(
@@ -180,6 +206,8 @@ public class MainWindow extends JFrame
     public void mouseDragged(MouseEvent mouseEvent) {
         if (edged.isSelected()) {
             graph.continueEdge(mouseEvent);
+        } else if(moveVertex.isSelected()) {
+            graph.moveVertex(mouseEvent);
         }
     }
 
