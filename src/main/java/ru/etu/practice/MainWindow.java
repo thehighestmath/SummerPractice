@@ -82,15 +82,13 @@ public class MainWindow extends JFrame
         if (vertexes.isSelected()) {
             boolean emptyArea = true;
             List<Ellipse2D> vertexes = graph.getVertexes();
-            for(Ellipse2D vertex : vertexes) {
-                if(vertex.getBounds2D().contains(mouseEvent.getPoint()))
-                {
+            for (Ellipse2D vertex : vertexes) {
+                if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     emptyArea = false;
                     break;
                 }
             }
-            if(emptyArea)
-            {
+            if (emptyArea) {
                 graph.addVertex.mouseClicked(mouseEvent);
                 outVertexes.add(vertex++);
             }
@@ -128,18 +126,18 @@ public class MainWindow extends JFrame
                         JOptionPane.ERROR_MESSAGE
                 );
             }
-        } else if(moveVertex.isSelected()) { // переместить это в стягивание вершин. Требуется пояснение для изменения
+        } else if (moveVertex.isSelected()) { // переместить это в стягивание вершин. Требуется пояснение для изменения
             Ellipse2D movedVertex;
             List<Ellipse2D> vertexes = graph.getVertexes();
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     movedVertex = vertex;
-                    graph.chooseMovebleVertex(movedVertex);
+                    graph.chooseMovableVertex(movedVertex);
                     break;
                 }
             }
         }
-        }
+    }
 
     private void setEdge(List<Edge> edges) {
         String result = JOptionPane.showInputDialog(
@@ -153,18 +151,18 @@ public class MainWindow extends JFrame
     }
 
     @Override
-    public void mouseReleased(MouseEvent mouseEvent) {
+    public void mouseReleased(MouseEvent mouseEvent) {// добавление проверки на то что концы ребра пренадлежат разным вершина
         if (edged.isSelected()) {
             List<Ellipse2D> vertexes = graph.getVertexes();
             boolean hasFound = false;
             char i = 0;
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
-                    hasFound = true;
-                    graph.releasedEdge(
-                            vertex.getBounds().getCenterX(),
-                            vertex.getBounds().getCenterY()
-                    );
+                    hasFound =
+                            graph.releasedEdge(
+                                    vertex.getBounds().getCenterX(),
+                                    vertex.getBounds().getCenterY()
+                            );
                     break;
                 }
                 i++;
@@ -206,7 +204,7 @@ public class MainWindow extends JFrame
     public void mouseDragged(MouseEvent mouseEvent) {
         if (edged.isSelected()) {
             graph.continueEdge(mouseEvent);
-        } else if(moveVertex.isSelected()) {
+        } else if (moveVertex.isSelected()) {
             graph.moveVertex(mouseEvent);
         }
     }

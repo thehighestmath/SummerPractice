@@ -64,11 +64,14 @@ public class MyJComponent extends JComponent {
         repaint();
     }
 
-    public void releasedEdge(double x, double y) {
+    public boolean releasedEdge(double x, double y) {
         Point2D point2D = new Point2D.Double(x, y);
+        if (point2D.equals(edge.getP1()))
+            return false;
         edge.setLine(edge.getP1(), point2D);
         edge = null;
         repaint();
+        return true;
     }
 
     public void clearLastEdge() {
@@ -76,12 +79,12 @@ public class MyJComponent extends JComponent {
         repaint();
     }
 
-    public void chooseMovebleVertex(Ellipse2D choosenVertex) {
-        vertex = choosenVertex;
+    public void chooseMovableVertex(Ellipse2D chosenVertex) {
+        vertex = chosenVertex;
     }
 
     public void moveVertex(MouseEvent mouseEvent) {
-        vertex.setFrame(mouseEvent.getX() - RADIUS/2, mouseEvent.getY() - RADIUS/2, RADIUS, RADIUS);
+        vertex.setFrame(mouseEvent.getX() - RADIUS / 2, mouseEvent.getY() - RADIUS / 2, RADIUS, RADIUS);
         repaint();
     }
 
