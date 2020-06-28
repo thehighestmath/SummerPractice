@@ -58,11 +58,11 @@ public class MainWindow extends JFrame
         panel.setLayout(new BorderLayout());
 
         grid.add(step, BorderLayout.NORTH);
-        grid.add(vertexes, BorderLayout.NORTH);
         grid.add(allSteps, BorderLayout.NORTH);
+        grid.add(clear, BorderLayout.NORTH);
+        grid.add(vertexes, BorderLayout.NORTH);
         grid.add(edged, BorderLayout.NORTH);
         grid.add(moveVertex, BorderLayout.EAST);
-        grid.add(clear, BorderLayout.NORTH);
 
         vertexes.addItemListener(this);
         edged.addItemListener(this);
@@ -130,15 +130,20 @@ public class MainWindow extends JFrame
                         JOptionPane.ERROR_MESSAGE
                 );
             }
-        } else if (moveVertex.isSelected()) { // переместить это в стягивание вершин. Требуется пояснение для изменения
+        } else if (moveVertex.isSelected()) {
+            boolean hasFound = false;
             List<Ellipse2D> vertexes = graph.getVertexes();
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     graph.chooseMovableVertex(vertex);
+                    graph.chooseMovableEdges();
+                    hasFound = true;
                     break;
                 }
             }
-
+            if(!hasFound) {
+                graph.chooseMovableVertex(null);
+            }
 
         }
     }
@@ -164,6 +169,7 @@ public class MainWindow extends JFrame
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     hasFound = true;
                     if (!graph.releasedEdge(vertex.getBounds().getCenterX(), vertex.getBounds().getCenterY())) {
+                        graph.clearLastEdge();
                         JOptionPane.showMessageDialog(
                                 this,
                                 "Ввод петель не возможен.",
@@ -205,6 +211,9 @@ public class MainWindow extends JFrame
                         JOptionPane.ERROR_MESSAGE
                 );
             }
+        } else if(moveVertex.isSelected()) {
+            graph.checkCollision();
+            graph.freeMovableVertex();
         }
     }
 
@@ -214,7 +223,7 @@ public class MainWindow extends JFrame
         if (edged.isSelected()) {
             graph.continueEdge(mouseEvent);
         } else if (moveVertex.isSelected()) {
-            graph.moveVertex(mouseEvent);
+            graph.moveVertex(mouseEvent.getPoint());
         }
     }
 

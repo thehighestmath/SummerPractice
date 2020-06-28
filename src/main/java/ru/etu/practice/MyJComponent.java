@@ -1,5 +1,7 @@
 package ru.etu.practice;
 
+import sun.jvm.hotspot.code.MonitorValue;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -19,7 +21,9 @@ public class MyJComponent extends JComponent {
     public List<Line2D> resultEdges = new LinkedList<>();
 
     private Ellipse2D vertex = null;
+    private Point2D previousPoint = new Point2D.Double();
     private Line2D edge = null;
+    private List<Line2D> movableEdges = new LinkedList<>();
     private static char name = 'a';
     private MainWindow mainWindow;
 
@@ -80,25 +84,51 @@ public class MyJComponent extends JComponent {
         repaint();
     }
 
-    public void chooseMovableVertex(Ellipse2D chosenVertex) {
-        vertex = chosenVertex;
+    public void checkCollision() {
+
+        if (vertex != null)
+            for (Ellipse2D anotherVertex : vertexes) {
+                if (!anotherVertex.equals(vertex) && anotherVertex.getBounds2D().intersects(vertex.getBounds2D())) {
+                    moveVertex(previousPoint);
+                    break;
+                }
+            }
     }
 
-    public void moveVertex(MouseEvent mouseEvent) {// нужна проверка на принадлежность ребра к вершине,
-        for(Line2D line : edges) {                 //  иначе возможен захват лишних ребер
+    public void freeMovableVertex() {
+        movableEdges.clear();
+        vertex = null;
+    }
+
+    public void chooseMovableVertex(Ellipse2D chosenVertex) {
+        vertex = chosenVertex;
+        if(chosenVertex != null) {
+            previousPoint.setLocation(vertex.getCenterX(), vertex.getCenterY());
+        }
+    }
+
+    private void getMovableEdges(List<Line2D> edges) {
+        for (Line2D line : edges) {
             if (vertex.getBounds2D().contains(line.getP1())) {
-                line.setLine(mouseEvent.getPoint(), line.getP2());
-            }else if (vertex.getBounds2D().contains(line.getP2())) {
-                line.setLine(line.getP1(), mouseEvent.getPoint());
+                previousPoint = line.getP1();
+                line.setLine(line.getP2(), previousPoint);
+                movableEdges.add(line);
+            } else if (vertex.getBounds2D().contains(line.getP2())) {
+                movableEdges.add(line);
             }
         }
+    }
 
-        for(Line2D line : resultEdges) {
-            if (vertex.getBounds2D().contains(line.getP1())) {
-                line.setLine(mouseEvent.getPoint(), line.getP2());
-            }else if (vertex.getBounds2D().contains(line.getP2())) {
-                line.setLine(line.getP1(), mouseEvent.getPoint());
-            }
+    public void chooseMovableEdges() {
+        getMovableEdges(edges);
+        getMovableEdges(resultEdges);
+    }
+
+    public void moveVertex(Point2D mouseEvent) {// проверка замедляет отклик на действия
+        if (vertex == null)
+            return;
+        for (Line2D line : movableEdges) {
+            line.setLine(line.getP1(), mouseEvent);
         }
         vertex.setFrame(mouseEvent.getX() - RADIUS / 2, mouseEvent.getY() - RADIUS / 2, RADIUS, RADIUS);
         repaint();
