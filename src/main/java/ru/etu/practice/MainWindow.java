@@ -33,10 +33,11 @@ public class MainWindow extends JFrame
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
-    JPanel grid = new MyJPanel(new GridLayout(2, 2));
+    JPanel grid = new MyJPanel(new GridLayout(2, 3));
 
     JButton step = new JButton("Следующий шаг");
     JButton allSteps = new JButton("Визуализация");
+    JButton clear = new JButton("Удалить граф");
 
     JRadioButton vertexes = new JRadioButton("Ввод вершин", true);
     JRadioButton edged = new JRadioButton("Стягивание вершин");
@@ -53,6 +54,7 @@ public class MainWindow extends JFrame
         type.add(vertexes);
         type.add(edged);
         type.add(moveVertex);
+        type.add(clear);
         panel.setLayout(new BorderLayout());
 
         grid.add(step, BorderLayout.NORTH);
@@ -60,6 +62,7 @@ public class MainWindow extends JFrame
         grid.add(allSteps, BorderLayout.NORTH);
         grid.add(edged, BorderLayout.NORTH);
         grid.add(moveVertex, BorderLayout.EAST);
+        grid.add(clear, BorderLayout.NORTH);
 
         vertexes.addItemListener(this);
         edged.addItemListener(this);
@@ -67,6 +70,7 @@ public class MainWindow extends JFrame
         step.addActionListener(this);
         allSteps.addActionListener(this);
         moveVertex.addActionListener(this);
+        clear.addActionListener(this);
 
         container.add("North", grid);
         container.add("Center", graph);
@@ -272,6 +276,11 @@ public class MainWindow extends JFrame
 
             this.graph.resultEdges = new LinkedList<>(lines2D);
             this.graph.repaint();
+        } else if (actionEvent.getSource() == clear) {
+            graph.clearScene();
+            outEdges.clear();
+            outVertexes.clear();
+            vertex = 'a';
         }
     }
 }
