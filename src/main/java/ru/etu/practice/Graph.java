@@ -158,6 +158,10 @@ public class Graph {
     }
 
     public State nextStep() {
+        if (i >= inputEdges.size()) {
+            return State.END;
+        }
+
         Edge edge = inputEdges.get(i++);
 
         State state = null;
