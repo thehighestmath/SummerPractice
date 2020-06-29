@@ -1,7 +1,5 @@
 package ru.etu.practice;
 
-import sun.jvm.hotspot.code.MonitorValue;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;

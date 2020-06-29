@@ -33,15 +33,14 @@ public class MainWindow extends JFrame
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
-    JPanel grid = new MyJPanel(new GridLayout(2, 3));
+    JPanel grid = new MyJPanel(new GridLayout(3, 2));
 
     JButton step = new JButton("Следующий шаг");
     JButton allSteps = new JButton("Визуализация");
     JButton clear = new JButton("Удалить граф");
 
-    JRadioButton vertexes = new JRadioButton("Ввод вершин", true);
+    JRadioButton vertexes = new JRadioButton("Ввод вершины / перемещение вершины", true);
     JRadioButton edged = new JRadioButton("Стягивание вершин");
-    JRadioButton moveVertex = new JRadioButton("переместить вершину");
 
     ButtonGroup type = new ButtonGroup();
 
@@ -53,23 +52,20 @@ public class MainWindow extends JFrame
         add(panel);
         type.add(vertexes);
         type.add(edged);
-        type.add(moveVertex);
         type.add(clear);
         panel.setLayout(new BorderLayout());
 
         grid.add(step, BorderLayout.NORTH);
-        grid.add(allSteps, BorderLayout.NORTH);
-        grid.add(clear, BorderLayout.NORTH);
         grid.add(vertexes, BorderLayout.NORTH);
+        grid.add(allSteps, BorderLayout.NORTH);
         grid.add(edged, BorderLayout.NORTH);
-        grid.add(moveVertex, BorderLayout.EAST);
+        grid.add(clear, BorderLayout.NORTH);
 
         vertexes.addItemListener(this);
         edged.addItemListener(this);
 
         step.addActionListener(this);
         allSteps.addActionListener(this);
-        moveVertex.addActionListener(this);
         clear.addActionListener(this);
 
         container.add("North", grid);
@@ -130,7 +126,7 @@ public class MainWindow extends JFrame
                         JOptionPane.ERROR_MESSAGE
                 );
             }
-        } else if (moveVertex.isSelected()) {
+        } else if (vertexes.isSelected()) {
             boolean hasFound = false;
             List<Ellipse2D> vertexes = graph.getVertexes();
             for (Ellipse2D vertex : vertexes) {
@@ -141,7 +137,7 @@ public class MainWindow extends JFrame
                     break;
                 }
             }
-            if(!hasFound) {
+            if (!hasFound) {
                 graph.chooseMovableVertex(null);
             }
 
@@ -149,14 +145,27 @@ public class MainWindow extends JFrame
     }
 
     private void setEdge(List<Edge> edges) {
-        String result = JOptionPane.showInputDialog(
-                this,
-                "<html><h2>Введите вес ребра");
-        if (result.matches("\\d+")) {
-            int distance = Integer.parseInt(result);
-            Edge edge = new Edge(fromVertex, toVertex, distance);
-            edges.add(edge);
-        }
+        String result;
+        boolean isFirst = true;
+        do {
+            if (!isFirst) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Нужно ввести положительно число.\n" +
+                                "Попробуйте еще раз",
+                        "Ошибка",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+            result = JOptionPane.showInputDialog(
+                    this,
+                    "<html><h2>Введите вес ребра");
+            isFirst = false;
+        } while (result == null || !result.matches("\\d+") || Integer.parseInt(result) == 0);
+
+        int distance = Integer.parseInt(result);
+        Edge edge = new Edge(fromVertex, toVertex, distance);
+        edges.add(edge);
     }
 
     @Override
@@ -174,7 +183,7 @@ public class MainWindow extends JFrame
                                 this,
                                 "Ввод петель не возможен.",
                                 "Сообщение",
-                                JOptionPane.ERROR_MESSAGE
+                                JOptionPane.WARNING_MESSAGE
                         );
                         return;
                     }
@@ -211,7 +220,7 @@ public class MainWindow extends JFrame
                         JOptionPane.ERROR_MESSAGE
                 );
             }
-        } else if(moveVertex.isSelected()) {
+        } else if (vertexes.isSelected()) {
             graph.checkCollision();
             graph.freeMovableVertex();
         }
@@ -222,7 +231,7 @@ public class MainWindow extends JFrame
     public void mouseDragged(MouseEvent mouseEvent) {
         if (edged.isSelected()) {
             graph.continueEdge(mouseEvent);
-        } else if (moveVertex.isSelected()) {
+        } else if (vertexes.isSelected()) {
             graph.moveVertex(mouseEvent.getPoint());
         }
     }
