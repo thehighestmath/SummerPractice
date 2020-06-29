@@ -43,6 +43,8 @@ class Edge {
 public class Graph {
     private static final int SIZE = 26;
 
+    private int i = 0;
+
     private int countVertexes;
 
     private final int[][] inputGraph;
@@ -55,6 +57,13 @@ public class Graph {
     private Set<Character> inputVertices;
     private final List<Set<Character>> outputVertices;
 
+    public List<Edge> getInputEdges() {
+        return inputEdges;
+    }
+
+    public Set<Character> getInputVertices() {
+        return inputVertices;
+    }
 
     public Graph() {
         inputGraph = new int[SIZE][SIZE];
@@ -68,6 +77,7 @@ public class Graph {
     public void initGraph(List<Edge> inputEdges, List<Character> inputVertices) {
         this.inputEdges = new LinkedList<>(inputEdges);
         this.inputVertices = new HashSet<>(inputVertices);
+        sortEdges();
     }
 
     public void readGraph() {
@@ -147,7 +157,9 @@ public class Graph {
         return outputEdges;
     }
 
-    private State nextStep(Edge edge) {
+    public State nextStep() {
+        Edge edge = inputEdges.get(i++);
+
         State state = null;
         Set<Character> tempVertexes = new HashSet<>();
         Character vertex1 = edge.from;
@@ -192,9 +204,8 @@ public class Graph {
     }
 
     public void kraskal() {
-        sortEdges();
-        for (Edge edge : inputEdges) {
-            State state = nextStep(edge);
+        for (Edge ignored : inputEdges) {
+            State state = nextStep();
             System.err.println(state);
             if (state == State.END) {
                 break;

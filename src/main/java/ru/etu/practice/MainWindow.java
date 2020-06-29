@@ -44,6 +44,12 @@ public class MainWindow extends JFrame
 
     ButtonGroup type = new ButtonGroup();
 
+    Graph graphStep = new Graph();
+    List<Edge> outEdgesStep = graphStep.getOutputEdges();
+    List<Ellipse2D> vertexesStep = graph.getVertexes();
+    List<Line2D> lines2DStep = new LinkedList<>();
+    int stepID = 0;
+
     public MainWindow() {
         super("Визуализатор алгоритма Краскала");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -160,8 +166,12 @@ public class MainWindow extends JFrame
             result = JOptionPane.showInputDialog(
                     this,
                     "<html><h2>Введите вес ребра");
+            if (result == null) {
+                graph.clearLastEdge();
+                return;
+            }
             isFirst = false;
-        } while (result == null || !result.matches("\\d+") || Integer.parseInt(result) == 0);
+        } while (!result.matches("\\d+") || Integer.parseInt(result) == 0);
 
         int distance = Integer.parseInt(result);
         Edge edge = new Edge(fromVertex, toVertex, distance);
@@ -267,29 +277,7 @@ public class MainWindow extends JFrame
             List<Ellipse2D> vertexes = this.graph.getVertexes();
             List<Line2D> lines2D = new LinkedList<>();
             for (Edge edge : outEdges) {
-                char from = edge.from;
-                char to = edge.to;
-                double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-                char i = 0;
-                for (Ellipse2D vertex : vertexes) {
-                    Rectangle2D rectangle2D = vertex.getBounds2D();
-                    double x = rectangle2D.getCenterX();
-                    double y = rectangle2D.getCenterY();
-                    if (from == (char) ('a' + i)) {
-                        x1 = x;
-                        y1 = y;
-                    } else if (to == (char) ('a' + i)) {
-                        x2 = x;
-                        y2 = y;
-                    }
-                    i++;
-                }
-                Point2D pointFrom = new Point2D.Double(x1, y1);
-                Point2D pointTo = new Point2D.Double(x2, y2);
-                Line2D line2D = new Line2D.Double(
-                        pointFrom, pointTo
-                );
-                lines2D.add(line2D);
+                addLine2d(edge, vertexes, lines2D);
             }
 
             this.graph.resultEdges = new LinkedList<>(lines2D);
@@ -299,6 +287,51 @@ public class MainWindow extends JFrame
             outEdges.clear();
             outVertexes.clear();
             vertex = 'a';
+        } else if (actionEvent.getSource() == step) {
+            /**
+             * шаговая визуализация
+             * TODO: посмотри этот момент
+             */
+            if (graphStep.getInputEdges().size() == 0 && graphStep.getInputVertices().size() == 0) {
+                graphStep.initGraph(outEdges, outVertexes);
+                outEdgesStep = graphStep.getOutputEdges();
+                vertexesStep = graph.getVertexes();
+            }
+            System.out.println(graphStep.nextStep());
+            if (stepID < outEdgesStep.size()) {
+                Edge edge = outEdgesStep.get(stepID);
+                addLine2d(edge, vertexesStep, this.graph.resultEdges);
+                stepID++;
+                this.graph.repaint();
+            }
+        } else {
+            assert false;
         }
+    }
+
+    private void addLine2d(Edge edge, List<Ellipse2D> vertexes, List<Line2D> lines2D){
+        char from = edge.from;
+        char to = edge.to;
+        double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+        char i = 0;
+        for (Ellipse2D vertex : vertexes) {
+            Rectangle2D rectangle2D = vertex.getBounds2D();
+            double x = rectangle2D.getCenterX();
+            double y = rectangle2D.getCenterY();
+            if (from == (char) ('a' + i)) {
+                x1 = x;
+                y1 = y;
+            } else if (to == (char) ('a' + i)) {
+                x2 = x;
+                y2 = y;
+            }
+            i++;
+        }
+        Point2D pointFrom = new Point2D.Double(x1, y1);
+        Point2D pointTo = new Point2D.Double(x2, y2);
+        Line2D line2D = new Line2D.Double(
+                pointFrom, pointTo
+        );
+        lines2D.add(line2D);
     }
 }

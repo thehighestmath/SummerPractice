@@ -83,7 +83,6 @@ public class MyJComponent extends JComponent {
     }
 
     public void checkCollision() {
-
         if (vertex != null)
             for (Ellipse2D anotherVertex : vertexes) {
                 if (!anotherVertex.equals(vertex) && anotherVertex.getBounds2D().intersects(vertex.getBounds2D())) {
