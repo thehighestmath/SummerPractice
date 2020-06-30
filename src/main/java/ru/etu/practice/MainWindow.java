@@ -26,6 +26,8 @@ public class MainWindow extends JFrame
     private char vertex = 'a';
     private char fromVertex;
     private char toVertex;
+    private boolean graphInitiated = false;
+    private boolean graphModified = false;
 
     ClassLoader classLoader = this.getClass().getClassLoader();
 
@@ -291,7 +293,37 @@ public class MainWindow extends JFrame
             /**
              * шаговая визуализация
              * TODO: посмотри этот момент
+             * TODO: + перделать шаговую визуализацию
              */
+            if(graphInitiated) {
+                if(graphModified) {
+                    /*
+                    need to delete result and back to start
+                     */
+
+                    graphInitiated = false;
+                    graphModified = false;
+
+                }else {
+                    /*
+                    do another step
+                     */
+                    graphStep.nextStep();//
+                }
+            }else {
+                /*
+                init graph and do first step
+                 */
+                graphStep.initGraph(outEdges, outVertexes);
+                graphInitiated = true;
+                outEdgesStep = graphStep.getOutputEdges();
+                vertexesStep = graph.getVertexes();
+                /*
+                need to think about how we get next edge from inputEdges
+                maybe need to eraise first list elem, because we don't use inputEdges
+                any more
+                 */
+            }
             if (graphStep.getInputEdges().size() == 0 && graphStep.getInputVertices().size() == 0) {
                 graphStep.initGraph(outEdges, outVertexes);
                 outEdgesStep = graphStep.getOutputEdges();
@@ -310,28 +342,28 @@ public class MainWindow extends JFrame
     }
 
     private void addLine2d(Edge edge, List<Ellipse2D> vertexes, List<Line2D> lines2D){
-        char from = edge.from;
-        char to = edge.to;
-        double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-        char i = 0;
-        for (Ellipse2D vertex : vertexes) {
-            Rectangle2D rectangle2D = vertex.getBounds2D();
-            double x = rectangle2D.getCenterX();
-            double y = rectangle2D.getCenterY();
-            if (from == (char) ('a' + i)) {
-                x1 = x;
-                y1 = y;
-            } else if (to == (char) ('a' + i)) {
-                x2 = x;
-                y2 = y;
+                char from = edge.from;
+                char to = edge.to;
+                double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+                char i = 0;
+                for (Ellipse2D vertex : vertexes) {
+                    Rectangle2D rectangle2D = vertex.getBounds2D();
+                    double x = rectangle2D.getCenterX();
+                    double y = rectangle2D.getCenterY();
+                    if (from == (char) ('a' + i)) {
+                        x1 = x;
+                        y1 = y;
+                    } else if (to == (char) ('a' + i)) {
+                        x2 = x;
+                        y2 = y;
+                    }
+                    i++;
+                }
+                Point2D pointFrom = new Point2D.Double(x1, y1);
+                Point2D pointTo = new Point2D.Double(x2, y2);
+                Line2D line2D = new Line2D.Double(
+                        pointFrom, pointTo
+                );
+                lines2D.add(line2D);
             }
-            i++;
-        }
-        Point2D pointFrom = new Point2D.Double(x1, y1);
-        Point2D pointTo = new Point2D.Double(x2, y2);
-        Line2D line2D = new Line2D.Double(
-                pointFrom, pointTo
-        );
-        lines2D.add(line2D);
-    }
 }
