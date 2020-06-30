@@ -1,6 +1,10 @@
 package ru.etu.practice;
 
 import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
@@ -49,7 +53,8 @@ public class MainWindow extends JFrame
 
     ButtonGroup type = new ButtonGroup();
 
-    JTextArea textArea = new JTextArea(10, 20);
+    JTextArea textArea = new JTextArea(10, 50);
+    JScrollPane pane = new JScrollPane(textArea);
 
     Graph graphStep = new Graph();
     List<Edge> outEdgesStep = graphStep.getOutputEdges();
@@ -63,6 +68,12 @@ public class MainWindow extends JFrame
         setSize(900, 640);
         setVisible(true);
 
+        pane.setPreferredSize(new Dimension(150, 200));
+        pane.setBorder(BorderFactory.createTitledBorder("Шаги алгоритма"));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         grid.setPreferredSize(new Dimension(200, 200));
 
         container.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -90,14 +101,14 @@ public class MainWindow extends JFrame
         constraints.gridwidth = 4;
         container.add(graph, constraints);
 
-        constraints.fill = GridBagConstraints.NONE;
+        constraints.fill = GridBagConstraints.BOTH;
         constraints.gridx = 4;
         constraints.gridy = 3;
-        constraints.ipady = 500;
+//        constraints.ipady = 500;
         constraints.ipadx = 150;
         constraints.gridheight = 4;
         constraints.gridwidth = 1;
-        container.add(textArea, constraints);
+        container.add(pane, constraints);
         setLocationRelativeTo(null);
 
 //        add(panel);
@@ -107,8 +118,7 @@ public class MainWindow extends JFrame
 //
         graph.setPreferredSize(new Dimension(700, 500));
         graph.setBorder(BorderFactory.createTitledBorder("Graph"));
-        textArea.setPreferredSize(new Dimension(150, 500));
-        textArea.setBorder(BorderFactory.createTitledBorder("Шаги алогитма"));
+
 //
         grid.add(step, BorderLayout.NORTH);
         grid.add(vertexes, BorderLayout.NORTH);
@@ -132,6 +142,9 @@ public class MainWindow extends JFrame
 //
         graph.addMouseListener(this);
         graph.addMouseMotionListener(this);
+
+        Font font = new Font(null, Font.BOLD, 14);
+        textArea.setFont(font);
 //
 //        setLocationRelativeTo(null);
     }
@@ -368,6 +381,7 @@ public class MainWindow extends JFrame
                      +Избавиться от проверки stepID < outEdgesStep.size() и заменить её на проверку State
                      */
                     State tmpState = graphStep.nextStep();
+                    addStepInfo(String.valueOf(tmpState));
                     System.out.println(stepID);
                     if (stepID < outEdgesStep.size()) {
                         Edge edge = outEdgesStep.get(stepID);
@@ -417,5 +431,9 @@ public class MainWindow extends JFrame
                 pointFrom, pointTo
         );
         lines2D.add(line2D);
+    }
+
+    private void addStepInfo(String msg) {
+        textArea.setText(textArea.getText() + msg + '\n');
     }
 }
