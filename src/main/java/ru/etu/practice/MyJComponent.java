@@ -131,10 +131,15 @@ public class MyJComponent extends JComponent {
         repaint();
     }
 
+    public void clearResult() {
+        resultEdges.clear();
+        repaint();
+    }
+
     public void clearScene() {
         vertexes.clear();
         edges.clear();
-        resultEdges.clear();
+        clearResult();
         repaint();
     }
 

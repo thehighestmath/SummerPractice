@@ -96,9 +96,10 @@ public class MainWindow extends JFrame
                     break;
                 }
             }
-            if (emptyArea) {
+            if (emptyArea) {// в методе addVertex требуется вместо return прописать выброс исключения и отлавливать его здесь
                 graph.addVertex.mouseClicked(mouseEvent);
                 outVertexes.add(vertex++);
+                graphModified = graphInitiated;
             }
         } else if (edged.isSelected()) {
 
@@ -178,6 +179,7 @@ public class MainWindow extends JFrame
         int distance = Integer.parseInt(result);
         Edge edge = new Edge(fromVertex, toVertex, distance);
         edges.add(edge);
+        graphModified = graphInitiated;
     }
 
     @Override
@@ -271,11 +273,10 @@ public class MainWindow extends JFrame
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if (actionEvent.getSource() == allSteps) {
-            Graph graph = new Graph();
-            graph.initGraph(outEdges, outVertexes);
-            graph.kraskal();
-            List<Edge> outEdges = graph.getOutputEdges();
+        if (actionEvent.getSource() == allSteps) {// переписать этот шаг
+            graphStep.initGraph(outEdges, outVertexes);
+            graphStep.kraskal();
+            List<Edge> outEdges = graphStep.getOutputEdges();
             List<Ellipse2D> vertexes = this.graph.getVertexes();
             List<Line2D> lines2D = new LinkedList<>();
             for (Edge edge : outEdges) {
@@ -289,52 +290,52 @@ public class MainWindow extends JFrame
             outEdges.clear();
             outVertexes.clear();
             vertex = 'a';
+            graphInitiated = false;
+            graphModified =  false;
         } else if (actionEvent.getSource() == step) {
-            /**
-             * шаговая визуализация
-             * TODO: посмотри этот момент
-             * TODO: + перделать шаговую визуализацию
-             */
             if(graphInitiated) {
                 if(graphModified) {
                     /*
                     need to delete result and back to start
                      */
-
+                    stepID = 0;
                     graphInitiated = false;
                     graphModified = false;
-
+                    graphStep.clearOutput();
+                    graph.clearResult();
                 }else {
                     /*
                     do another step
+                    TODO
+                    +требуется добавить метод(задача на третью итерацию), возвращающий рассматриваемое ребро
+                    в метод покраски нужно передавать состояние в которое зашел алгоритм
+                     новая компонента и соединение компонент - зеленый
+                     остовное дерево - синий
+                     цикл - красный
+                     При вызове следующего шага или визуализации, требуется стереть все красные ребра. А зеленые перекрасить в синий
+
+                     +Избавиться от проверки stepID < outEdgesStep.size() и заменить её на проверку State
                      */
-                    graphStep.nextStep();//
+                    State tmpState = graphStep.nextStep();
+                    System.out.println(stepID);
+                    if (stepID < outEdgesStep.size()) {
+                        Edge edge = outEdgesStep.get(stepID);
+                        addLine2d(edge, vertexesStep, this.graph.resultEdges);
+                        stepID++;
+                        this.graph.repaint();
+                    }
+                    if (tmpState == State.END)
+                        graphModified = true;
                 }
             }else {
                 /*
                 init graph and do first step
                  */
                 graphStep.initGraph(outEdges, outVertexes);
+                stepID = 0;
                 graphInitiated = true;
                 outEdgesStep = graphStep.getOutputEdges();
                 vertexesStep = graph.getVertexes();
-                /*
-                need to think about how we get next edge from inputEdges
-                maybe need to eraise first list elem, because we don't use inputEdges
-                any more
-                 */
-            }
-            if (graphStep.getInputEdges().size() == 0 && graphStep.getInputVertices().size() == 0) {
-                graphStep.initGraph(outEdges, outVertexes);
-                outEdgesStep = graphStep.getOutputEdges();
-                vertexesStep = graph.getVertexes();
-            }
-            System.out.println(graphStep.nextStep());
-            if (stepID < outEdgesStep.size()) {
-                Edge edge = outEdgesStep.get(stepID);
-                addLine2d(edge, vertexesStep, this.graph.resultEdges);
-                stepID++;
-                this.graph.repaint();
             }
         } else {
             assert false;

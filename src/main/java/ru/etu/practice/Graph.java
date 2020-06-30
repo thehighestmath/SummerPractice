@@ -200,7 +200,7 @@ public class Graph {
             state = State.NEW_COMPONENT;
             outputVertices.add(tempVertexes);
         }
-        if (outputVertices.get(0).size() == countVertexes) {
+        if (outputVertices.get(0).size() == inputVertices.size()) {
             state = State.END;
         }
 //        assert state != null;
@@ -239,6 +239,12 @@ public class Graph {
             }
             System.out.println();
         }
+    }
+
+    public void clearOutput() {
+        outputEdges.clear();
+        outputVertices.clear();
+        i = 0;
     }
 
     public void printInputEdges() {
