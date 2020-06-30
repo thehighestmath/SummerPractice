@@ -31,11 +31,14 @@ public class MainWindow extends JFrame
 
     ClassLoader classLoader = this.getClass().getClassLoader();
 
+    GridBagConstraints constraints = new GridBagConstraints();
+
     MyJComponent graph = new MyJComponent(this);
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
     JPanel grid = new MyJPanel(new GridLayout(3, 2));
+    JPanel grid2 = new MyJPanel(new GridBagLayout());
 
     JButton step = new JButton("Следующий шаг");
     JButton allSteps = new JButton("Визуализация");
@@ -46,6 +49,8 @@ public class MainWindow extends JFrame
 
     ButtonGroup type = new ButtonGroup();
 
+    JTextArea textArea = new JTextArea(10, 20);
+
     Graph graphStep = new Graph();
     List<Edge> outEdgesStep = graphStep.getOutputEdges();
     List<Ellipse2D> vertexesStep = graph.getVertexes();
@@ -55,34 +60,80 @@ public class MainWindow extends JFrame
     public MainWindow() {
         super("Визуализатор алгоритма Краскала");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(900, 640);
         setVisible(true);
-        add(panel);
+
+        grid.setPreferredSize(new Dimension(200, 200));
+
+        container.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+        container.setLayout(new GridBagLayout());
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.NORTH;
+        constraints.weightx = 0.5;
+        constraints.weighty = 0.5;
+//        constraints.ipady = 200;
+//        constraints.ipadx = 200;
+        constraints.gridheight = 3;
+        constraints.gridwidth = 2;
+
+        constraints.gridx = 0;  // нулевая ячейка таблицы по вертикали
+        constraints.gridy = 0;      // нулевая ячейка таблицы по горизонтали
+        container.add(grid, constraints);
+
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.ipady = 500;
+        constraints.ipadx = 700;
+        constraints.gridheight = 4;
+        constraints.gridwidth = 4;
+        container.add(graph, constraints);
+
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.gridx = 4;
+        constraints.gridy = 3;
+        constraints.ipady = 500;
+        constraints.ipadx = 150;
+        constraints.gridheight = 4;
+        constraints.gridwidth = 1;
+        container.add(textArea, constraints);
+        setLocationRelativeTo(null);
+
+//        add(panel);
         type.add(vertexes);
         type.add(edged);
-        type.add(clear);
-        panel.setLayout(new BorderLayout());
-
+//        panel.setLayout(new BorderLayout());
+//
+        graph.setPreferredSize(new Dimension(700, 500));
+        graph.setBorder(BorderFactory.createTitledBorder("Graph"));
+        textArea.setPreferredSize(new Dimension(150, 500));
+        textArea.setBorder(BorderFactory.createTitledBorder("Шаги алогитма"));
+//
         grid.add(step, BorderLayout.NORTH);
         grid.add(vertexes, BorderLayout.NORTH);
         grid.add(allSteps, BorderLayout.NORTH);
         grid.add(edged, BorderLayout.NORTH);
         grid.add(clear, BorderLayout.NORTH);
-
+//
+//        grid2.add(graph, BorderLayout.WEST);
+//        grid2.add(textArea, BorderLayout.EAST);
+//
         vertexes.addItemListener(this);
         edged.addItemListener(this);
 
         step.addActionListener(this);
         allSteps.addActionListener(this);
         clear.addActionListener(this);
-
-        container.add("North", grid);
-        container.add("Center", graph);
-
+//
+//        container.add("North", grid);
+//        container.add("South", grid2);
+////        container.add("East", textArea);
+//
         graph.addMouseListener(this);
         graph.addMouseMotionListener(this);
-
-        setLocationRelativeTo(null);
+//
+//        setLocationRelativeTo(null);
     }
 
     @Override
@@ -291,10 +342,10 @@ public class MainWindow extends JFrame
             outVertexes.clear();
             vertex = 'a';
             graphInitiated = false;
-            graphModified =  false;
+            graphModified = false;
         } else if (actionEvent.getSource() == step) {
-            if(graphInitiated) {
-                if(graphModified) {
+            if (graphInitiated) {
+                if (graphModified) {
                     /*
                     need to delete result and back to start
                      */
@@ -303,7 +354,7 @@ public class MainWindow extends JFrame
                     graphModified = false;
                     graphStep.clearOutput();
                     graph.clearResult();
-                }else {
+                } else {
                     /*
                     do another step
                     TODO
@@ -327,7 +378,7 @@ public class MainWindow extends JFrame
                     if (tmpState == State.END)
                         graphModified = true;
                 }
-            }else {
+            } else {
                 /*
                 init graph and do first step
                  */
@@ -342,29 +393,29 @@ public class MainWindow extends JFrame
         }
     }
 
-    private void addLine2d(Edge edge, List<Ellipse2D> vertexes, List<Line2D> lines2D){
-                char from = edge.from;
-                char to = edge.to;
-                double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-                char i = 0;
-                for (Ellipse2D vertex : vertexes) {
-                    Rectangle2D rectangle2D = vertex.getBounds2D();
-                    double x = rectangle2D.getCenterX();
-                    double y = rectangle2D.getCenterY();
-                    if (from == (char) ('a' + i)) {
-                        x1 = x;
-                        y1 = y;
-                    } else if (to == (char) ('a' + i)) {
-                        x2 = x;
-                        y2 = y;
-                    }
-                    i++;
-                }
-                Point2D pointFrom = new Point2D.Double(x1, y1);
-                Point2D pointTo = new Point2D.Double(x2, y2);
-                Line2D line2D = new Line2D.Double(
-                        pointFrom, pointTo
-                );
-                lines2D.add(line2D);
+    private void addLine2d(Edge edge, List<Ellipse2D> vertexes, List<Line2D> lines2D) {
+        char from = edge.from;
+        char to = edge.to;
+        double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+        char i = 0;
+        for (Ellipse2D vertex : vertexes) {
+            Rectangle2D rectangle2D = vertex.getBounds2D();
+            double x = rectangle2D.getCenterX();
+            double y = rectangle2D.getCenterY();
+            if (from == (char) ('a' + i)) {
+                x1 = x;
+                y1 = y;
+            } else if (to == (char) ('a' + i)) {
+                x2 = x;
+                y2 = y;
             }
+            i++;
+        }
+        Point2D pointFrom = new Point2D.Double(x1, y1);
+        Point2D pointTo = new Point2D.Double(x2, y2);
+        Line2D line2D = new Line2D.Double(
+                pointFrom, pointTo
+        );
+        lines2D.add(line2D);
+    }
 }
