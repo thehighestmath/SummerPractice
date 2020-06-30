@@ -1,0 +1,17 @@
+7
+e d 7
+e c 6
+a e 1
+c d 2
+a b 3
+b e 4
+b c 5
+
+
+--- Result ---
+From	To		Distance
+a		e		1
+c		d		2
+a		b		3
+b		c		5
+a b c d e

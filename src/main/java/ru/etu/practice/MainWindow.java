@@ -31,11 +31,14 @@ public class MainWindow extends JFrame
 
     ClassLoader classLoader = this.getClass().getClassLoader();
 
+    GridBagConstraints constraints = new GridBagConstraints();
+
     MyJComponent graph = new MyJComponent(this);
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
     JPanel grid = new MyJPanel(new GridLayout(3, 2));
+    JPanel grid2 = new MyJPanel(new GridBagLayout());
 
     JButton step = new JButton("Следующий шаг");
     JButton allSteps = new JButton("Визуализация");
@@ -46,6 +49,8 @@ public class MainWindow extends JFrame
 
     ButtonGroup type = new ButtonGroup();
 
+    JTextArea textArea = new JTextArea(10, 20);
+
     Graph graphStep = new Graph();
     List<Edge> outEdgesStep = graphStep.getOutputEdges();
     List<Ellipse2D> vertexesStep = graph.getVertexes();
@@ -55,34 +60,80 @@ public class MainWindow extends JFrame
     public MainWindow() {
         super("Визуализатор алгоритма Краскала");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(900, 640);
         setVisible(true);
-        add(panel);
+
+        grid.setPreferredSize(new Dimension(200, 200));
+
+        container.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+        container.setLayout(new GridBagLayout());
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.NORTH;
+        constraints.weightx = 0.5;
+        constraints.weighty = 0.5;
+//        constraints.ipady = 200;
+//        constraints.ipadx = 200;
+        constraints.gridheight = 3;
+        constraints.gridwidth = 2;
+
+        constraints.gridx = 0;  // нулевая ячейка таблицы по вертикали
+        constraints.gridy = 0;      // нулевая ячейка таблицы по горизонтали
+        container.add(grid, constraints);
+
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.ipady = 500;
+        constraints.ipadx = 700;
+        constraints.gridheight = 4;
+        constraints.gridwidth = 4;
+        container.add(graph, constraints);
+
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.gridx = 4;
+        constraints.gridy = 3;
+        constraints.ipady = 500;
+        constraints.ipadx = 150;
+        constraints.gridheight = 4;
+        constraints.gridwidth = 1;
+        container.add(textArea, constraints);
+        setLocationRelativeTo(null);
+
+//        add(panel);
         type.add(vertexes);
         type.add(edged);
-        type.add(clear);
-        panel.setLayout(new BorderLayout());
-
+//        panel.setLayout(new BorderLayout());
+//
+        graph.setPreferredSize(new Dimension(700, 500));
+        graph.setBorder(BorderFactory.createTitledBorder("Graph"));
+        textArea.setPreferredSize(new Dimension(150, 500));
+        textArea.setBorder(BorderFactory.createTitledBorder("Шаги алогитма"));
+//
         grid.add(step, BorderLayout.NORTH);
         grid.add(vertexes, BorderLayout.NORTH);
         grid.add(allSteps, BorderLayout.NORTH);
         grid.add(edged, BorderLayout.NORTH);
         grid.add(clear, BorderLayout.NORTH);
-
+//
+//        grid2.add(graph, BorderLayout.WEST);
+//        grid2.add(textArea, BorderLayout.EAST);
+//
         vertexes.addItemListener(this);
         edged.addItemListener(this);
 
         step.addActionListener(this);
         allSteps.addActionListener(this);
         clear.addActionListener(this);
-
-        container.add("North", grid);
-        container.add("Center", graph);
-
+//
+//        container.add("North", grid);
+//        container.add("South", grid2);
+////        container.add("East", textArea);
+//
         graph.addMouseListener(this);
         graph.addMouseMotionListener(this);
-
-        setLocationRelativeTo(null);
+//
+//        setLocationRelativeTo(null);
     }
 
     @Override
