@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class MainWindow extends JFrame
         implements MouseListener, MouseMotionListener, ItemListener, ActionListener {
@@ -46,6 +47,7 @@ public class MainWindow extends JFrame
 
     JRadioButton vertexes = new JRadioButton("Ввод вершины / перемещение вершины", true);
     JRadioButton edged = new JRadioButton("Стягивание вершин");
+    JRadioButton delete = new JRadioButton("Удалить ребро / Удалить вершину");
 
     ButtonGroup type = new ButtonGroup();
 
@@ -103,6 +105,10 @@ public class MainWindow extends JFrame
 //        add(panel);
         type.add(vertexes);
         type.add(edged);
+//        type.add(clear);
+        type.add(delete);
+        panel.setLayout(new BorderLayout());
+
 //        panel.setLayout(new BorderLayout());
 //
         graph.setPreferredSize(new Dimension(700, 500));
@@ -119,12 +125,15 @@ public class MainWindow extends JFrame
 //        grid2.add(graph, BorderLayout.WEST);
 //        grid2.add(textArea, BorderLayout.EAST);
 //
+        grid.add(delete, BorderLayout.NORTH);
+
         vertexes.addItemListener(this);
         edged.addItemListener(this);
 
         step.addActionListener(this);
         allSteps.addActionListener(this);
         clear.addActionListener(this);
+        delete.addActionListener(this);
 //
 //        container.add("North", grid);
 //        container.add("South", grid2);
@@ -154,7 +163,12 @@ public class MainWindow extends JFrame
             }
         } else if (edged.isSelected()) {
 
-        } else {
+        } else if(delete.isSelected()) {
+            graph.getEdges().removeIf(elem -> elem.getBounds().contains(mouseEvent.getPoint()));
+            graph.getVertexes().removeIf(elem -> elem.contains(mouseEvent.getPoint()));
+            graphInitiated = false;
+            graph.repaint();
+        }else {
             assert false;
         }
     }
