@@ -99,7 +99,7 @@ public class MyJComponent extends JComponent {
 
     public void chooseMovableVertex(Ellipse2D chosenVertex) {
         vertex = chosenVertex;
-        if(chosenVertex != null) {
+        if (chosenVertex != null) {
             previousPoint.setLocation(vertex.getCenterX(), vertex.getCenterY());
         }
     }
@@ -121,7 +121,7 @@ public class MyJComponent extends JComponent {
         getMovableEdges(resultEdges);
     }
 
-    public void moveVertex(Point2D mouseEvent) {// проверка замедляет отклик на действия
+    public void moveVertex(Point2D mouseEvent) {
         if (vertex == null)
             return;
         for (Line2D line : movableEdges) {
@@ -131,10 +131,15 @@ public class MyJComponent extends JComponent {
         repaint();
     }
 
+    public void clearResult() {
+        resultEdges.clear();
+        repaint();
+    }
+
     public void clearScene() {
         vertexes.clear();
         edges.clear();
-        resultEdges.clear();
+        clearResult();
         repaint();
     }
 
