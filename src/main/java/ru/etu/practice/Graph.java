@@ -232,6 +232,7 @@ public class Graph {
 //        if (outputVertices.get(0).size() == inputVertices.size()) {
 //            tuple.add(State.END);
 //            value -= edge.distance;
+//            tuple.add(value);
 //            return tuple;
 //        }
 //        assert state != null;
@@ -239,8 +240,9 @@ public class Graph {
     }
 
     public String kraskal() {
+        i = -1;
         StringBuilder result = new StringBuilder();
-        for (Edge ignored : inputEdges) {
+        while (true) {
             List<Object> tuple = nextStep();
             result.append(addStepInfo(tuple));
             System.err.println(tuple.get(0));
