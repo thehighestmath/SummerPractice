@@ -24,10 +24,12 @@ public class MyJComponent extends JComponent {
     private List<Line2D> movableEdges = new LinkedList<>();
     private static char name = 'a';
     private List<Edge> outEdges;
+    private final List<Character> charVertexes;
 
-    public MyJComponent(List<Edge> edgesList) {
+    public MyJComponent(List<Edge> edgesList, List<Character> characterList) {
         super();
         outEdges = edgesList;
+        charVertexes = characterList;
     }
 
     public List<Ellipse2D> getVertexes() {
@@ -202,7 +204,7 @@ public class MyJComponent extends JComponent {
             int x = vertex.getBounds().x;
             int y = vertex.getBounds().y;
 
-            g2d.drawString(String.valueOf(name++), x + 15, y + 25);
+            g2d.drawString(String.valueOf(charVertexes.get(vertexes.indexOf(vertex))), x + 15, y + 25);
         }
     }
 }

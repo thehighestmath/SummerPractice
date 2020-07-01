@@ -38,7 +38,7 @@ public class MainWindow extends JFrame
 
     GridBagConstraints constraints = new GridBagConstraints();
 
-    MyJComponent graph = new MyJComponent(outEdges);
+    MyJComponent graph = new MyJComponent(outEdges, outVertexes);
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
@@ -66,7 +66,6 @@ public class MainWindow extends JFrame
 
     public MainWindow() {
         super("Визуализатор алгоритма Краскала");
-        assert (outEdges != outEdgesStep);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(950, 640);
         setVisible(true);
@@ -170,7 +169,7 @@ public class MainWindow extends JFrame
                     break;
                 }
             }
-            if (emptyArea) {// в методе addVertex требуется вместо return прописать выброс исключения и отлавливать его здесь
+            if (emptyArea) {
                 graph.addVertex.mouseClicked(mouseEvent);
                 outVertexes.add(vertex++);
                 graphModified = true;
@@ -178,44 +177,31 @@ public class MainWindow extends JFrame
         } else if (edged.isSelected()) {
 
         } else if(delete.isSelected()) {
-            /**
-             * TODO
-             * переделать удаление вершин
-             */
-
-            /*for(Ellipse2D vertex : graph.getVertexes()) {
+            for(Ellipse2D vertex : graph.getVertexes()) {
                 if(vertex.contains(mouseEvent.getPoint())) {
-                    final char cr = (char) ('a' + graph.getVertexes().indexOf(vertex));
-                    for(Line2D edge : graph.getEdges()) {
-                        if(vertex.contains(edge.getP1()) || vertex.contains(edge.getP2())) {
-                            //getOutEdges().remove(graph.getEdges().indexOf(edge)); // здесь необходимо отталкиваться от символов
-                            //graph.getEdges().remove(edge);
-                            graphModified = true;
-                        }
-                    }
+                    final char cr = outVertexes.get(graph.getVertexes().indexOf(vertex));
                     outVertexes.remove(graph.getVertexes().indexOf(vertex));
-
-                    outEdges.removeIf(elem -> elem.from == cr || elem.to == cr); // удаление всех инцидентных ребер
-                    for(Edge edge : outEdgesStep) {                                        // поправка для ребер
-                        if(edge.to > cr) edge.to--;
-                        if(edge.from >cr) edge.from--;
-                    }
-                    //graph.getVertexes().remove(vertex);
+                    graph.getEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
+                    outEdges.removeIf(elem -> elem.from == cr || elem.to == cr);
+                    graph.getResultEdgesEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
+                    graphStep.getOutputEdges().removeIf(elem -> elem.from == cr || elem.to == cr);
+                    graph.getVertexes().remove(vertex);
                     graphModified = true;
                     repaint();
                     break;
                 }
-            }*/
+            }
 
             for(Line2D edge : graph.getEdges()) {
                 if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
-                    getOutEdges().remove(graph.getEdges().indexOf(edge));
+                    outEdges.remove(graph.getEdges().indexOf(edge));
                     graph.getEdges().remove(edge);
                     graphModified = true;
                     repaint();
                     break;
                 }
             }
+
             for(Line2D edge : graph.getResultEdgesEdges()) {
                 if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
                     graph.getResultEdgesEdges().remove(edge);
@@ -225,9 +211,7 @@ public class MainWindow extends JFrame
                 }
             }
 
-            //graph.getEdges().removeIf(elem -> elem.contains(mouseEvent.getPoint()));
-            //graph.getVertexes().removeIf(elem -> elem.contains(mouseEvent.getPoint()));
-            graph.repaint();
+            repaint();
         }else {
             assert false;
         }
@@ -246,13 +230,12 @@ public class MainWindow extends JFrame
                             vertex.getBounds().getCenterX(),
                             vertex.getBounds().getCenterY()
                     );
+                    fromVertex = outVertexes.get(vertexes.indexOf(vertex));
                     break;
                 }
                 i++;
             }
-            if (hasFound) {
-                fromVertex = (char) ('a' + i);
-            } else {
+            if (!hasFound) {
                 JOptionPane.showMessageDialog(
                         this,
                         "Кажется, что Вы не попали в область вершины, попробуйте ещё раз",
@@ -326,11 +309,12 @@ public class MainWindow extends JFrame
                         );
                         return;
                     }
+                    toVertex = outVertexes.get(vertexes.indexOf(vertex));
                     break;
                 }
                 i++;
             }
-            toVertex = (char) ('a' + i);
+            //toVertex = (char) ('a' + i);
             if (outEdges.size() > 0) {
                 Edge currentEdge = new Edge(fromVertex, toVertex, 0);
                 for (Edge outEdge : outEdges) {
@@ -396,9 +380,22 @@ public class MainWindow extends JFrame
 
     }
 
+    private void clearData() {
+        stepID = 0;
+        graphInitiated = false;
+        graphModified = false;
+        graphStep.clearOutput();
+        graph.clearResult();
+        addStepInfo(String.valueOf(State.CLEAR));
+        addStepInfo("===============");
+    }
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getSource() == allSteps) {// переписать этот шаг
+            if(graphModified) {
+                clearData();
+            }
             graphStep.initGraph(outEdges, outVertexes);
             graphStep.kraskal();
             List<Edge> outEdges = graphStep.getOutputEdges();
@@ -414,6 +411,7 @@ public class MainWindow extends JFrame
             graph.clearScene();
             outEdges.clear();
             outVertexes.clear();
+            outEdgesStep.clear();
             vertex = 'a';
             graphInitiated = false;
             graphModified = false;
@@ -423,13 +421,7 @@ public class MainWindow extends JFrame
                     /*
                     need to delete result and back to start
                      */
-                    stepID = 0;
-                    graphInitiated = false;
-                    graphModified = false;
-                    graphStep.clearOutput();
-                    graph.clearResult();
-                    addStepInfo(String.valueOf(State.CLEAR));
-                    addStepInfo("===============");
+                    clearData();
                     actionPerformed(actionEvent);
                 } else {
                     /*
@@ -455,7 +447,6 @@ public class MainWindow extends JFrame
                         this.graph.repaint();
                     }
                     if (tuple.get(0) == State.END) {
-                        outEdges.equals(outEdges);
                         graphModified = true;
                         addStepInfo("============================");
                     }
@@ -485,10 +476,12 @@ public class MainWindow extends JFrame
             Rectangle2D rectangle2D = vertex.getBounds2D();
             double x = rectangle2D.getCenterX();
             double y = rectangle2D.getCenterY();
-            if (from == (char) ('a' + i)) {
+            //if (from == (char) ('a' + i)) {
+            if (from == outVertexes.get(vertexes.indexOf(vertex))) {
                 x1 = x;
                 y1 = y;
-            } else if (to == (char) ('a' + i)) {
+            //} else if (to == (char) ('a' + i)) {
+            } else if (to == outVertexes.get(vertexes.indexOf(vertex))) {
                 x2 = x;
                 y2 = y;
             }
