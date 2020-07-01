@@ -339,7 +339,7 @@ public class MainWindow extends JFrame
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getSource() == allSteps) {// переписать этот шаг
             graphStep.initGraph(outEdges, outVertexes);
-            graphStep.kraskal();
+            addStepInfo(graphStep.kraskal());
             List<Edge> outEdges = graphStep.getOutputEdges();
             List<Ellipse2D> vertexes = this.graph.getVertexes();
             List<Line2D> lines2D = new LinkedList<>();
@@ -384,7 +384,7 @@ public class MainWindow extends JFrame
                      +Избавиться от проверки stepID < outEdgesStep.size() и заменить её на проверку State
                      */
                     List<Object> tuple = graphStep.nextStep();
-                    tuple.add(graphStep.getValue());
+//                    tuple.add(graphStep.getValue());
                     addStepInfo(tuple);
                     System.out.println(stepID);
                     if (stepID < outEdgesStep.size()) {
@@ -441,35 +441,7 @@ public class MainWindow extends JFrame
     }
 
     private void addStepInfo(List<Object> tuple) {
-        State state = (State) tuple.get(0);
-        StringBuilder addText = new StringBuilder();
-        if (state == State.SORT) {
-            addText.append(state);
-        } else if (state == State.END) {
-            assert tuple.size() > 1;
-            addText.append(state);
-            addText.append("\n");
-            int value = (int) tuple.get(1);
-            addText.append("Minimum spanning tree weight is ");
-            addText.append(value);
-        }
-        else if (state == State.LOOP){
-            assert tuple.size() > 1;
-            addText.append(state);
-            addText.append(" | ");
-            Edge edge = (Edge) tuple.get(1);
-            addText.append(edge);
-            addText.append(" will not be added");
-        }else {
-            assert tuple.size() > 1;
-            addText.append(state);
-            addText.append(" | ");
-            Edge edge = (Edge) tuple.get(1);
-            addText.append(edge);
-            addText.append(" added");
-        }
-        textArea.setText(textArea.getText() + addText.toString() + "\n");
-
+        textArea.setText(textArea.getText() + Graph.addStepInfo(tuple));
     }
 
     private void addStepInfo(String msg) {

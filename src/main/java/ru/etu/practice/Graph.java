@@ -157,10 +157,6 @@ public class Graph {
         return outputEdges;
     }
 
-    public int getValue() {
-        return value;
-    }
-
     /**
      * tuple.get(0) instanceof State -- return state
      * tuple.get(1) instanceof Edge -- added edge
@@ -177,6 +173,7 @@ public class Graph {
         }
         if (i >= inputEdges.size()) {
             tuple.add(State.END);
+            tuple.add(value);
             return tuple;
         }
 
@@ -192,6 +189,7 @@ public class Graph {
             if (outputVertices.get(0).size() == inputVertices.size()) {
                 tuple.add(State.END);
                 value -= edge.distance;
+                tuple.add(value);
                 return tuple;
             }
         }
@@ -240,14 +238,48 @@ public class Graph {
         return tuple;
     }
 
-    public void kraskal() {
+    public String kraskal() {
+        StringBuilder result = new StringBuilder();
         for (Edge ignored : inputEdges) {
             List<Object> tuple = nextStep();
+            result.append(addStepInfo(tuple));
             System.err.println(tuple.get(0));
             if (tuple.get(0) == State.END) {
                 break;
             }
         }
+        result.append("============================");
+        return result.toString();
+    }
+
+    public static String addStepInfo(List<Object> tuple) {
+        State state = (State) tuple.get(0);
+        StringBuilder addText = new StringBuilder();
+        if (state == State.SORT) {
+            addText.append(state);
+        } else if (state == State.END) {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append("\n");
+            int value = (int) tuple.get(1);
+            addText.append("Minimum spanning tree weight is ");
+            addText.append(value);
+        } else if (state == State.LOOP) {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append(" | ");
+            Edge edge = (Edge) tuple.get(1);
+            addText.append(edge);
+            addText.append(" will not be added");
+        } else {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append(" | ");
+            Edge edge = (Edge) tuple.get(1);
+            addText.append(edge);
+            addText.append(" added");
+        }
+        return addText.toString() + "\n";
     }
 
     private boolean isCommon(Set<Character> first, Set<Character> second) {
