@@ -26,7 +26,7 @@ public class MainWindow extends JFrame
         return outEdges;
     }
 
-    private final List<Character> outVertexes = new LinkedList<>();
+    private final List<Character> outVertexes = new LinkedList<>(); // вершины графа
     private final List<Edge> outEdges = new LinkedList<>();
     private char vertex = 'a';
     private char fromVertex;
@@ -38,7 +38,7 @@ public class MainWindow extends JFrame
 
     GridBagConstraints constraints = new GridBagConstraints();
 
-    MyJComponent graph = new MyJComponent(this);
+    MyJComponent graph = new MyJComponent(outEdges);
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
@@ -66,6 +66,7 @@ public class MainWindow extends JFrame
 
     public MainWindow() {
         super("Визуализатор алгоритма Краскала");
+        assert (outEdges != outEdgesStep);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(950, 640);
         setVisible(true);
@@ -172,14 +173,60 @@ public class MainWindow extends JFrame
             if (emptyArea) {// в методе addVertex требуется вместо return прописать выброс исключения и отлавливать его здесь
                 graph.addVertex.mouseClicked(mouseEvent);
                 outVertexes.add(vertex++);
-                graphModified = graphInitiated;
+                graphModified = true;
             }
         } else if (edged.isSelected()) {
 
         } else if(delete.isSelected()) {
-            graph.getEdges().removeIf(elem -> elem.getBounds().contains(mouseEvent.getPoint()));
-            graph.getVertexes().removeIf(elem -> elem.contains(mouseEvent.getPoint()));
-            graphInitiated = false;
+            /**
+             * TODO
+             * переделать удаление вершин
+             */
+
+            /*for(Ellipse2D vertex : graph.getVertexes()) {
+                if(vertex.contains(mouseEvent.getPoint())) {
+                    final char cr = (char) ('a' + graph.getVertexes().indexOf(vertex));
+                    for(Line2D edge : graph.getEdges()) {
+                        if(vertex.contains(edge.getP1()) || vertex.contains(edge.getP2())) {
+                            //getOutEdges().remove(graph.getEdges().indexOf(edge)); // здесь необходимо отталкиваться от символов
+                            //graph.getEdges().remove(edge);
+                            graphModified = true;
+                        }
+                    }
+                    outVertexes.remove(graph.getVertexes().indexOf(vertex));
+
+                    outEdges.removeIf(elem -> elem.from == cr || elem.to == cr); // удаление всех инцидентных ребер
+                    for(Edge edge : outEdgesStep) {                                        // поправка для ребер
+                        if(edge.to > cr) edge.to--;
+                        if(edge.from >cr) edge.from--;
+                    }
+                    //graph.getVertexes().remove(vertex);
+                    graphModified = true;
+                    repaint();
+                    break;
+                }
+            }*/
+
+            for(Line2D edge : graph.getEdges()) {
+                if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
+                    getOutEdges().remove(graph.getEdges().indexOf(edge));
+                    graph.getEdges().remove(edge);
+                    graphModified = true;
+                    repaint();
+                    break;
+                }
+            }
+            for(Line2D edge : graph.getResultEdgesEdges()) {
+                if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
+                    graph.getResultEdgesEdges().remove(edge);
+                    graphModified = true;
+                    repaint();
+                    break;
+                }
+            }
+
+            //graph.getEdges().removeIf(elem -> elem.contains(mouseEvent.getPoint()));
+            //graph.getVertexes().removeIf(elem -> elem.contains(mouseEvent.getPoint()));
             graph.repaint();
         }else {
             assert false;
@@ -408,6 +455,7 @@ public class MainWindow extends JFrame
                         this.graph.repaint();
                     }
                     if (tuple.get(0) == State.END) {
+                        outEdges.equals(outEdges);
                         graphModified = true;
                         addStepInfo("============================");
                     }

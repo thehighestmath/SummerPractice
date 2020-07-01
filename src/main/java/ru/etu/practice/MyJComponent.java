@@ -23,11 +23,11 @@ public class MyJComponent extends JComponent {
     private Line2D edge = null;
     private List<Line2D> movableEdges = new LinkedList<>();
     private static char name = 'a';
-    private MainWindow mainWindow;
+    private List<Edge> outEdges;
 
-    public MyJComponent(MainWindow mainWindow) {
+    public MyJComponent(List<Edge> edgesList) {
         super();
-        this.mainWindow = mainWindow;
+        outEdges = edgesList;
     }
 
     public List<Ellipse2D> getVertexes() {
@@ -36,6 +36,10 @@ public class MyJComponent extends JComponent {
 
     public List<Line2D> getEdges() {
         return edges;
+    }
+
+    public List<Line2D> getResultEdgesEdges() {
+        return resultEdges;
     }
 
     MouseAdapter addVertex = new MouseAdapter() {
@@ -153,7 +157,6 @@ public class MyJComponent extends JComponent {
         // размер шрифта
         g2d.setFont(new Font("TimesNewRoman", Font.BOLD, 18));
 
-        List<Edge> outEdges = mainWindow.getOutEdges();
         int i = 0;
         for (Line2D edge : edges) {
             g2d.setPaint(Color.BLACK);
