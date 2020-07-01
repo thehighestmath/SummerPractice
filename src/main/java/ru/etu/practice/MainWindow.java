@@ -13,6 +13,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class MainWindow extends JFrame
         implements MouseListener, MouseMotionListener, ItemListener, ActionListener {
@@ -25,7 +26,7 @@ public class MainWindow extends JFrame
         return outEdges;
     }
 
-    private final List<Character> outVertexes = new LinkedList<>();
+    private final List<Character> outVertexes = new LinkedList<>(); // вершины графа
     private final List<Edge> outEdges = new LinkedList<>();
     private char vertex = 'a';
     private char fromVertex;
@@ -37,7 +38,7 @@ public class MainWindow extends JFrame
 
     GridBagConstraints constraints = new GridBagConstraints();
 
-    MyJComponent graph = new MyJComponent(this);
+    MyJComponent graph = new MyJComponent(outEdges, outVertexes);
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
@@ -50,6 +51,7 @@ public class MainWindow extends JFrame
 
     JRadioButton vertexes = new JRadioButton("Ввод вершины / перемещение вершины", true);
     JRadioButton edged = new JRadioButton("Стягивание вершин");
+    JRadioButton delete = new JRadioButton("Удалить ребро / Удалить вершину");
 
     ButtonGroup type = new ButtonGroup();
 
@@ -114,6 +116,10 @@ public class MainWindow extends JFrame
 //        add(panel);
         type.add(vertexes);
         type.add(edged);
+//        type.add(clear);
+        type.add(delete);
+        panel.setLayout(new BorderLayout());
+
 //        panel.setLayout(new BorderLayout());
 //
         graph.setPreferredSize(new Dimension(700, 500));
@@ -129,12 +135,15 @@ public class MainWindow extends JFrame
 //        grid2.add(graph, BorderLayout.WEST);
 //        grid2.add(textArea, BorderLayout.EAST);
 //
+        grid.add(delete, BorderLayout.NORTH);
+
         vertexes.addItemListener(this);
         edged.addItemListener(this);
 
         step.addActionListener(this);
         allSteps.addActionListener(this);
         clear.addActionListener(this);
+        delete.addActionListener(this);
 //
 //        container.add("North", grid);
 //        container.add("South", grid2);
@@ -160,14 +169,50 @@ public class MainWindow extends JFrame
                     break;
                 }
             }
-            if (emptyArea) {// в методе addVertex требуется вместо return прописать выброс исключения и отлавливать его здесь
+            if (emptyArea) {
                 graph.addVertex.mouseClicked(mouseEvent);
                 outVertexes.add(vertex++);
-                graphModified = graphInitiated;
+                graphModified = true;
             }
         } else if (edged.isSelected()) {
 
-        } else {
+        } else if(delete.isSelected()) {
+            for(Ellipse2D vertex : graph.getVertexes()) {
+                if(vertex.contains(mouseEvent.getPoint())) {
+                    final char cr = outVertexes.get(graph.getVertexes().indexOf(vertex));
+                    outVertexes.remove(graph.getVertexes().indexOf(vertex));
+                    graph.getEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
+                    outEdges.removeIf(elem -> elem.from == cr || elem.to == cr);
+                    graph.getResultEdgesEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
+                    graphStep.getOutputEdges().removeIf(elem -> elem.from == cr || elem.to == cr);
+                    graph.getVertexes().remove(vertex);
+                    graphModified = true;
+                    repaint();
+                    break;
+                }
+            }
+
+            for(Line2D edge : graph.getEdges()) {
+                if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
+                    outEdges.remove(graph.getEdges().indexOf(edge));
+                    graph.getEdges().remove(edge);
+                    graphModified = true;
+                    repaint();
+                    break;
+                }
+            }
+
+            for(Line2D edge : graph.getResultEdgesEdges()) {
+                if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
+                    graph.getResultEdgesEdges().remove(edge);
+                    graphModified = true;
+                    repaint();
+                    break;
+                }
+            }
+
+            repaint();
+        }else {
             assert false;
         }
     }
@@ -185,13 +230,12 @@ public class MainWindow extends JFrame
                             vertex.getBounds().getCenterX(),
                             vertex.getBounds().getCenterY()
                     );
+                    fromVertex = outVertexes.get(vertexes.indexOf(vertex));
                     break;
                 }
                 i++;
             }
-            if (hasFound) {
-                fromVertex = (char) ('a' + i);
-            } else {
+            if (!hasFound) {
                 JOptionPane.showMessageDialog(
                         this,
                         "Кажется, что Вы не попали в область вершины, попробуйте ещё раз",
@@ -265,11 +309,12 @@ public class MainWindow extends JFrame
                         );
                         return;
                     }
+                    toVertex = outVertexes.get(vertexes.indexOf(vertex));
                     break;
                 }
                 i++;
             }
-            toVertex = (char) ('a' + i);
+            //toVertex = (char) ('a' + i);
             if (outEdges.size() > 0) {
                 Edge currentEdge = new Edge(fromVertex, toVertex, 0);
                 for (Edge outEdge : outEdges) {
@@ -335,9 +380,22 @@ public class MainWindow extends JFrame
 
     }
 
+    private void clearData() {
+        stepID = 0;
+        graphInitiated = false;
+        graphModified = false;
+        graphStep.clearOutput();
+        graph.clearResult();
+        addStepInfo(String.valueOf(State.CLEAR));
+        addStepInfo("===============");
+    }
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getSource() == allSteps) {// переписать этот шаг
+            if(graphModified) {
+                clearData();
+            }
             graphStep.initGraph(outEdges, outVertexes);
             addStepInfo(graphStep.kraskal());
             List<Edge> outEdges = graphStep.getOutputEdges();
@@ -353,6 +411,7 @@ public class MainWindow extends JFrame
             graph.clearScene();
             outEdges.clear();
             outVertexes.clear();
+            outEdgesStep.clear();
             vertex = 'a';
             graphInitiated = false;
             graphModified = false;
@@ -362,13 +421,7 @@ public class MainWindow extends JFrame
                     /*
                     need to delete result and back to start
                      */
-                    stepID = 0;
-                    graphInitiated = false;
-                    graphModified = false;
-                    graphStep.clearOutput();
-                    graph.clearResult();
-                    addStepInfo(String.valueOf(State.CLEAR));
-                    addStepInfo("===============");
+                    clearData();
                     actionPerformed(actionEvent);
                 } else {
                     /*
@@ -423,10 +476,12 @@ public class MainWindow extends JFrame
             Rectangle2D rectangle2D = vertex.getBounds2D();
             double x = rectangle2D.getCenterX();
             double y = rectangle2D.getCenterY();
-            if (from == (char) ('a' + i)) {
+            //if (from == (char) ('a' + i)) {
+            if (from == outVertexes.get(vertexes.indexOf(vertex))) {
                 x1 = x;
                 y1 = y;
-            } else if (to == (char) ('a' + i)) {
+            //} else if (to == (char) ('a' + i)) {
+            } else if (to == outVertexes.get(vertexes.indexOf(vertex))) {
                 x2 = x;
                 y2 = y;
             }
