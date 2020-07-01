@@ -67,7 +67,7 @@ public class MainWindow extends JFrame
     public MainWindow() {
         super("Визуализатор алгоритма Краскала");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 640);
+        setSize(950, 640);
         setVisible(true);
 
         pane.setPreferredSize(new Dimension(150, 200));
@@ -88,7 +88,7 @@ public class MainWindow extends JFrame
 //        constraints.ipady = 200;
 //        constraints.ipadx = 200;
         constraints.gridheight = 3;
-        constraints.gridwidth = 2;
+        constraints.gridwidth = 3;
 
         constraints.gridx = 0;  // нулевая ячейка таблицы по вертикали
         constraints.gridy = 0;      // нулевая ячейка таблицы по горизонтали
@@ -98,7 +98,7 @@ public class MainWindow extends JFrame
         constraints.gridx = 0;
         constraints.gridy = 3;
         constraints.ipady = 500;
-        constraints.ipadx = 700;
+        constraints.ipadx = 800;
         constraints.gridheight = 4;
         constraints.gridwidth = 4;
         container.add(graph, constraints);
@@ -107,7 +107,7 @@ public class MainWindow extends JFrame
         constraints.gridx = 4;
         constraints.gridy = 3;
 //        constraints.ipady = 500;
-        constraints.ipadx = 150;
+        constraints.ipadx = 400;
         constraints.gridheight = 4;
         constraints.gridwidth = 1;
         container.add(pane, constraints);
@@ -152,7 +152,7 @@ public class MainWindow extends JFrame
         graph.addMouseListener(this);
         graph.addMouseMotionListener(this);
 
-        Font font = new Font(null, Font.BOLD, 14);
+        Font font = new Font(null, Font.BOLD, 12);
         textArea.setFont(font);
 //
 //        setLocationRelativeTo(null);
@@ -381,6 +381,9 @@ public class MainWindow extends JFrame
                     graphModified = false;
                     graphStep.clearOutput();
                     graph.clearResult();
+                    addStepInfo(String.valueOf(State.CLEAR));
+                    addStepInfo("===============");
+                    actionPerformed(actionEvent);
                 } else {
                     /*
                     do another step
@@ -394,8 +397,9 @@ public class MainWindow extends JFrame
 
                      +Избавиться от проверки stepID < outEdgesStep.size() и заменить её на проверку State
                      */
-                    State tmpState = graphStep.nextStep();
-                    addStepInfo(String.valueOf(tmpState));
+                    List<Object> tuple = graphStep.nextStep();
+                    tuple.add(graphStep.getValue());
+                    addStepInfo(tuple);
                     System.out.println(stepID);
                     if (stepID < outEdgesStep.size()) {
                         Edge edge = outEdgesStep.get(stepID);
@@ -403,8 +407,10 @@ public class MainWindow extends JFrame
                         stepID++;
                         this.graph.repaint();
                     }
-                    if (tmpState == State.END)
+                    if (tuple.get(0) == State.END) {
                         graphModified = true;
+                        addStepInfo("============================");
+                    }
                 }
             } else {
                 /*
@@ -415,6 +421,7 @@ public class MainWindow extends JFrame
                 graphInitiated = true;
                 outEdgesStep = graphStep.getOutputEdges();
                 vertexesStep = graph.getVertexes();
+                actionPerformed(actionEvent);
             }
         } else {
             assert false;
@@ -447,7 +454,39 @@ public class MainWindow extends JFrame
         lines2D.add(line2D);
     }
 
+    private void addStepInfo(List<Object> tuple) {
+        State state = (State) tuple.get(0);
+        StringBuilder addText = new StringBuilder();
+        if (state == State.SORT) {
+            addText.append(state);
+        } else if (state == State.END) {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append("\n");
+            int value = (int) tuple.get(1);
+            addText.append("Minimum spanning tree weight is ");
+            addText.append(value);
+        }
+        else if (state == State.LOOP){
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append(" | ");
+            Edge edge = (Edge) tuple.get(1);
+            addText.append(edge);
+            addText.append(" will not be added");
+        }else {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append(" | ");
+            Edge edge = (Edge) tuple.get(1);
+            addText.append(edge);
+            addText.append(" added");
+        }
+        textArea.setText(textArea.getText() + addText.toString() + "\n");
+
+    }
+
     private void addStepInfo(String msg) {
-        textArea.setText(textArea.getText() + msg + '\n');
+        textArea.setText(textArea.getText() + msg + "\n");
     }
 }

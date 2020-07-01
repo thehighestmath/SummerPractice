@@ -3,6 +3,11 @@ package ru.etu.practice;
 import java.util.*;
 
 class Edge {
+    @Override
+    public String toString() {
+        return "Edge " + " " + from + "—" + to;
+    }
+
     /**
      * way from -> to == way to -> to
      */
@@ -43,13 +48,10 @@ class Edge {
 public class Graph {
     private static final int SIZE = 26;
 
-    private int i = 0;
-
-    private int countVertexes;
+    private int i = -1;
+    private int value = 0;
 
     private final int[][] inputGraph;
-    private final int[][] outputGraph;
-
 
     private List<Edge> inputEdges;
     private final List<Edge> outputEdges;
@@ -67,7 +69,6 @@ public class Graph {
 
     public Graph() {
         inputGraph = new int[SIZE][SIZE];
-        outputGraph = new int[SIZE][SIZE];
         inputEdges = new LinkedList<>();
         outputEdges = new LinkedList<>();
         inputVertices = new HashSet<>();
@@ -77,7 +78,7 @@ public class Graph {
     public void initGraph(List<Edge> inputEdges, List<Character> inputVertices) {
         this.inputEdges = new LinkedList<>(inputEdges);
         this.inputVertices = new HashSet<>(inputVertices);
-        sortEdges();
+//        sortEdges();
     }
 
     public void readGraph() {
@@ -117,7 +118,6 @@ public class Graph {
                 inputGraph[to - 'a'][from - 'a'] = distance;
             }
         }
-        countVertexes = inputVertices.size();
     }
 
     public void printGraph() {
@@ -157,29 +157,58 @@ public class Graph {
         return outputEdges;
     }
 
-    public State nextStep() {
+    public int getValue() {
+        return value;
+    }
+
+    /**
+     * tuple.get(0) instanceof State -- return state
+     * tuple.get(1) instanceof Edge -- added edge
+     *
+     * @return tuple
+     */
+    public List<Object> nextStep() {
+        List<Object> tuple = new LinkedList<>();
+        if (i == -1) {
+            sortEdges();
+            i++;
+            tuple.add(State.SORT);
+            return tuple;
+        }
         if (i >= inputEdges.size()) {
-            return State.END;
+            tuple.add(State.END);
+            return tuple;
         }
 
         Edge edge = inputEdges.get(i++);
-
-        State state = null;
+        value += edge.distance;
         Set<Character> tempVertexes = new HashSet<>();
         Character vertex1 = edge.from;
         Character vertex2 = edge.to;
         tempVertexes.add(vertex1);
         tempVertexes.add(vertex2);
 
+        if (outputVertices.size() > 0) {
+            if (outputVertices.get(0).size() == inputVertices.size()) {
+                tuple.add(State.END);
+                value -= edge.distance;
+                return tuple;
+            }
+        }
+
         boolean hasFound = false;
         for (Set<Character> currently : outputVertices) {
             if (isOld(currently, tempVertexes)) {
-                return State.LOOP;
+                tuple.add(State.LOOP);
+                tuple.add(edge);
+                value -= edge.distance;
+                return tuple;
             }
             if (isCommon(currently, tempVertexes)) {
                 hasFound = true;
                 currently.addAll(tempVertexes);
-                state = State.APPEND;
+                tuple.add(State.APPEND);
+                tuple.add(edge);
             }
         }
 
@@ -188,7 +217,8 @@ public class Graph {
                 Set<Character> first = outputVertices.get(i);
                 Set<Character> second = outputVertices.get(j);
                 if (isCommon(first, second)) {
-                    state = State.CONNECT_COMPONENTS;
+                    tuple.add(State.CONNECT_COMPONENTS);
+                    tuple.add(edge);
                     first.addAll(second);
                     second.clear();
                 }
@@ -197,21 +227,24 @@ public class Graph {
 
         outputEdges.add(edge);
         if (!hasFound) {
-            state = State.NEW_COMPONENT;
+            tuple.add(State.NEW_COMPONENT);
+            tuple.add(edge);
             outputVertices.add(tempVertexes);
         }
-        if (outputVertices.get(0).size() == inputVertices.size()) {
-            state = State.END;
-        }
+//        if (outputVertices.get(0).size() == inputVertices.size()) {
+//            tuple.add(State.END);
+//            value -= edge.distance;
+//            return tuple;
+//        }
 //        assert state != null;
-        return state;
+        return tuple;
     }
 
     public void kraskal() {
         for (Edge ignored : inputEdges) {
-            State state = nextStep();
-            System.err.println(state);
-            if (state == State.END) {
+            List<Object> tuple = nextStep();
+            System.err.println(tuple.get(0));
+            if (tuple.get(0) == State.END) {
                 break;
             }
         }
@@ -244,7 +277,8 @@ public class Graph {
     public void clearOutput() {
         outputEdges.clear();
         outputVertices.clear();
-        i = 0;
+        i = -1;
+        value = 0;
     }
 
     public void printInputEdges() {
