@@ -7,4 +7,5 @@ public enum State {
     CONNECT_COMPONENTS,
     NEW_COMPONENT,
     END,
+    CLEAR
 }
