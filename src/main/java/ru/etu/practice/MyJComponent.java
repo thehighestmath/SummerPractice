@@ -10,7 +10,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 public class MyJComponent extends JComponent {
     private final static float RADIUS = 40f;
@@ -22,8 +21,8 @@ public class MyJComponent extends JComponent {
     private Point2D previousPoint = new Point2D.Double();
     private Line2D edge = null;
     private List<Line2D> movableEdges = new LinkedList<>();
-    private static char name = 'a';
     private List<Edge> outEdges;
+    char name;
     private final List<Character> charVertexes;
 
     public MyJComponent(List<Edge> edgesList, List<Character> characterList) {
@@ -44,20 +43,32 @@ public class MyJComponent extends JComponent {
         return resultEdges;
     }
 
+    public char getLastAddedVertex() {
+        return name;
+    }
+
     MouseAdapter addVertex = new MouseAdapter() {
         public void mouseClicked(MouseEvent e) {
+            name = 'a';
+            for (char tmpChar : charVertexes) {
+                if (name != tmpChar) break;
+                else name++;
+            }
+
             if (name > 'z') {
                 return;
             }
+
+            charVertexes.add(name - 'a', name);
+
             vertex = new Ellipse2D.Double(
                     e.getPoint().getX() - RADIUS / 2,
                     e.getPoint().getY() - RADIUS / 2,
                     RADIUS,
                     RADIUS
             );
-            vertexes.add(vertex);
+            vertexes.add(name - 'a', vertex);
             repaint();
-            name++;
         }
     };
 
@@ -195,7 +206,6 @@ public class MyJComponent extends JComponent {
         // размер шрифта
         g2d.setFont(new Font("TimesNewRoman", Font.BOLD, 18));
 
-        char name = 'a';
         for (Ellipse2D vertex : vertexes) {
             g2d.setPaint(Color.WHITE);
             g2d.fill(vertex);

@@ -1,10 +1,6 @@
 package ru.etu.practice;
 
 import javax.swing.*;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
@@ -13,7 +9,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class MainWindow extends JFrame
         implements MouseListener, MouseMotionListener, ItemListener, ActionListener {
@@ -28,7 +23,6 @@ public class MainWindow extends JFrame
 
     private final List<Character> outVertexes = new LinkedList<>(); // вершины графа
     private final List<Edge> outEdges = new LinkedList<>();
-    private char vertex = 'a';
     private char fromVertex;
     private char toVertex;
     private boolean graphInitiated = false;
@@ -171,14 +165,17 @@ public class MainWindow extends JFrame
             }
             if (emptyArea) {
                 graph.addVertex.mouseClicked(mouseEvent);
-                outVertexes.add(vertex++);
-                graphModified = true;
+                char vertexChar = graph.getLastAddedVertex();
+                if (vertexChar <= 'z') {
+                    outVertexes.add(vertexChar);
+                    graphModified = true;
+                }
             }
         } else if (edged.isSelected()) {
 
-        } else if(delete.isSelected()) {
-            for(Ellipse2D vertex : graph.getVertexes()) {
-                if(vertex.contains(mouseEvent.getPoint())) {
+        } else if (delete.isSelected()) {
+            for (Ellipse2D vertex : graph.getVertexes()) {
+                if (vertex.contains(mouseEvent.getPoint())) {
                     final char cr = outVertexes.get(graph.getVertexes().indexOf(vertex));
                     outVertexes.remove(graph.getVertexes().indexOf(vertex));
                     graph.getEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
@@ -192,8 +189,8 @@ public class MainWindow extends JFrame
                 }
             }
 
-            for(Line2D edge : graph.getEdges()) {
-                if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
+            for (Line2D edge : graph.getEdges()) {
+                if (edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
                     outEdges.remove(graph.getEdges().indexOf(edge));
                     graph.getEdges().remove(edge);
                     graphModified = true;
@@ -202,8 +199,8 @@ public class MainWindow extends JFrame
                 }
             }
 
-            for(Line2D edge : graph.getResultEdgesEdges()) {
-                if(edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
+            for (Line2D edge : graph.getResultEdgesEdges()) {
+                if (edge.intersects(mouseEvent.getX() - 3, mouseEvent.getY() - 3, 6, 6)) {
                     graph.getResultEdgesEdges().remove(edge);
                     graphModified = true;
                     repaint();
@@ -212,7 +209,7 @@ public class MainWindow extends JFrame
             }
 
             repaint();
-        }else {
+        } else {
             assert false;
         }
     }
@@ -222,7 +219,6 @@ public class MainWindow extends JFrame
         if (edged.isSelected()) {
             List<Ellipse2D> vertexes = graph.getVertexes();
             boolean hasFound = false;
-            char i = 0;
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     hasFound = true;
@@ -233,7 +229,6 @@ public class MainWindow extends JFrame
                     fromVertex = outVertexes.get(vertexes.indexOf(vertex));
                     break;
                 }
-                i++;
             }
             if (!hasFound) {
                 JOptionPane.showMessageDialog(
@@ -295,7 +290,6 @@ public class MainWindow extends JFrame
         if (edged.isSelected()) {
             List<Ellipse2D> vertexes = graph.getVertexes();
             boolean hasFound = false;
-            char i = 0;
             for (Ellipse2D vertex : vertexes) {
                 if (vertex.getBounds2D().contains(mouseEvent.getPoint())) {
                     hasFound = true;
@@ -312,9 +306,7 @@ public class MainWindow extends JFrame
                     toVertex = outVertexes.get(vertexes.indexOf(vertex));
                     break;
                 }
-                i++;
             }
-            //toVertex = (char) ('a' + i);
             if (outEdges.size() > 0) {
                 Edge currentEdge = new Edge(fromVertex, toVertex, 0);
                 for (Edge outEdge : outEdges) {
@@ -393,7 +385,7 @@ public class MainWindow extends JFrame
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getSource() == allSteps) {// переписать этот шаг
-            if(graphModified) {
+            if (graphModified) {
                 clearData();
             }
             graphStep.initGraph(outEdges, outVertexes);
@@ -407,14 +399,13 @@ public class MainWindow extends JFrame
 
             this.graph.resultEdges = new LinkedList<>(lines2D);
             this.graph.repaint();
+            graphModified = true;
         } else if (actionEvent.getSource() == clear) {
             graph.clearScene();
+            clearData();
             outEdges.clear();
             outVertexes.clear();
             outEdgesStep.clear();
-            vertex = 'a';
-            graphInitiated = false;
-            graphModified = false;
         } else if (actionEvent.getSource() == step) {
             if (graphInitiated) {
                 if (graphModified) {
@@ -437,7 +428,6 @@ public class MainWindow extends JFrame
                      +Избавиться от проверки stepID < outEdgesStep.size() и заменить её на проверку State
                      */
                     List<Object> tuple = graphStep.nextStep();
-//                    tuple.add(graphStep.getValue());
                     addStepInfo(tuple);
                     System.out.println(stepID);
                     if (stepID < outEdgesStep.size()) {
@@ -471,21 +461,17 @@ public class MainWindow extends JFrame
         char from = edge.from;
         char to = edge.to;
         double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-        char i = 0;
         for (Ellipse2D vertex : vertexes) {
             Rectangle2D rectangle2D = vertex.getBounds2D();
             double x = rectangle2D.getCenterX();
             double y = rectangle2D.getCenterY();
-            //if (from == (char) ('a' + i)) {
             if (from == outVertexes.get(vertexes.indexOf(vertex))) {
                 x1 = x;
                 y1 = y;
-            //} else if (to == (char) ('a' + i)) {
             } else if (to == outVertexes.get(vertexes.indexOf(vertex))) {
                 x2 = x;
                 y2 = y;
             }
-            i++;
         }
         Point2D pointFrom = new Point2D.Double(x1, y1);
         Point2D pointTo = new Point2D.Double(x2, y2);
