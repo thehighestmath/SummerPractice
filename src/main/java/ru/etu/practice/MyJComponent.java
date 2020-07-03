@@ -11,7 +11,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MyJComponent extends JComponent{
+public class MyJComponent extends JComponent {
     private final static float RADIUS = 40f;
     private final List<Ellipse2D> vertexes = new LinkedList<>();
     private final List<Line2D> edges = new LinkedList<>();
@@ -22,8 +22,8 @@ public class MyJComponent extends JComponent{
     private Line2D edge = null;
     private List<Line2D> movableEdges = new LinkedList<>();
     private List<Edge> outEdges;
-    private List<Object> template;
-    char name;
+    private List<Object> tuple;
+    private char name;
     private final List<Character> charVertexes;
 
     public MyJComponent(List<Edge> edgesList, List<Character> characterList) {
@@ -48,8 +48,8 @@ public class MyJComponent extends JComponent{
         return name;
     }
 
-    public void setTemplate(List<Object> tmpTemplate) {
-        template = tmpTemplate;
+    public void setTuple(List<Object> tmpTemplate) {
+        tuple = tmpTemplate;
     }
 
     MouseAdapter addVertex = new MouseAdapter() {
@@ -179,20 +179,20 @@ public class MyJComponent extends JComponent{
         int i = 0;
         int from, to;
         Line2D loop = null;
-        if(template != null && template.size() == 2 && template.get(0) == State.LOOP )
-        {
-            from = ((Edge)template.get(1)).from - 'a';
-            to = ((Edge)template.get(1)).to - 'a';
-            loop = new Line2D.Double();
-            loop.setLine(vertexes.get(from).getBounds().getCenterX() - RADIUS/2, vertexes.get(to).getBounds().getCenterX() - RADIUS/2,
-                    vertexes.get(from).getBounds().getCenterY() - RADIUS/2,vertexes.get(to).getBounds().getCenterY() - RADIUS/2);
+        if (tuple != null && tuple.size() == 2 && tuple.get(0) == State.LOOP) {
+            from = ((Edge) tuple.get(1)).from - 'a';
+            to = ((Edge) tuple.get(1)).to - 'a';
+            loop = new Line2D.Double(vertexes.get(to).getBounds().getCenterX(),
+                    vertexes.get(to).getBounds().getCenterY(),
+                    vertexes.get(from).getBounds().getCenterX(),
+                    vertexes.get(from).getBounds().getCenterY());
         }
 
         for (Line2D edge : edges) {
-            if(template != null && template.size() == 2 && template.get(0) == State.LOOP &&
-                    (edge.getP1() == loop.getP1() && edge.getP2() == loop.getP2() || edge.getP1() == loop.getP2() && edge.getP1() == loop.getP2())) { //в процессе исправления
+            if (tuple != null && tuple.get(0) == State.LOOP &&
+                    (edge.getP1().equals(loop.getP1()) && edge.getP2().equals(loop.getP2()) || edge.getP1().equals(loop.getP2()) && edge.getP2().equals(loop.getP1())))
                 g2d.setPaint(Color.RED);
-            }else
+            else
                 g2d.setPaint(Color.BLACK);
             g2d.draw(edge);
             if (outEdges.size() > i) {
@@ -214,7 +214,6 @@ public class MyJComponent extends JComponent{
         }
 
 
-
         // толщина линии
         g2d.setStroke(new BasicStroke(5));
         g2d.setPaint(Color.BLUE);
@@ -223,11 +222,11 @@ public class MyJComponent extends JComponent{
             g2d.draw(edge);
         }
 
-        if(template != null && template.size() == 2) {
-            if(template.get(0) == State.NEW_COMPONENT || template.get(0) == State.APPEND) {
+        if (tuple != null && tuple.size() == 2) {
+            if (tuple.get(0) == State.NEW_COMPONENT || tuple.get(0) == State.APPEND) {
                 g2d.setPaint(Color.GREEN);
                 g2d.draw(resultEdges.get(resultEdges.size() - 1));
-            } else if(template.get(0) == State.END) {
+            } else if (tuple.get(0) == State.END) {
                 g2d.setPaint(Color.BLUE);
                 g2d.draw(resultEdges.get(resultEdges.size() - 1));
             }

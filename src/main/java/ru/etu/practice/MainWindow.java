@@ -387,10 +387,13 @@ public class MainWindow extends JFrame
         if (actionEvent.getSource() == allSteps) {// переписать этот шаг
             if (graphModified) {
                 clearData();
-                graph.setTemplate(null);
+                graph.setTuple(null);
             }
+
             graphStep.initGraph(outEdges, outVertexes);
             addStepInfo(graphStep.kraskal());
+            List<Object> tuple = graphStep.nextStep() ;
+            graph.setTuple(tuple);
             List<Edge> outEdges = graphStep.getOutputEdges();
             List<Ellipse2D> vertexes = this.graph.getVertexes();
             List<Line2D> lines2D = new LinkedList<>();
@@ -421,7 +424,7 @@ public class MainWindow extends JFrame
                      */
                     List<Object> tuple = graphStep.nextStep();
                     addStepInfo(tuple);
-                    graph.setTemplate(tuple);
+                    graph.setTuple(tuple);
                     //System.out.println(stepID);
                     if (stepID < outEdgesStep.size()) {
                         Edge edge = outEdgesStep.get(stepID);
@@ -439,7 +442,7 @@ public class MainWindow extends JFrame
                 init graph and do first step
                  */
                 graphStep.initGraph(outEdges, outVertexes);
-                graph.setTemplate(null);
+                graph.setTuple(null);
                 stepID = 0;
                 graphInitiated = true;
                 outEdgesStep = graphStep.getOutputEdges();
