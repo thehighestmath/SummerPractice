@@ -36,8 +36,8 @@ public class MainWindow extends JFrame
 
     JPanel panel = new MyJPanel();
     Container container = getContentPane();
+
     JPanel grid = new MyJPanel(new GridLayout(3, 2));
-    JPanel grid2 = new MyJPanel(new GridBagLayout());
 
     JButton step = new JButton("Следующий шаг");
     JButton allSteps = new JButton("Визуализация");
@@ -55,13 +55,13 @@ public class MainWindow extends JFrame
     Graph graphStep = new Graph();
     List<Edge> outEdgesStep = graphStep.getOutputEdges();
     List<Ellipse2D> vertexesStep = graph.getVertexes();
-    List<Line2D> lines2DStep = new LinkedList<>();
     int stepID = 0;
 
     public MainWindow() {
         super("Визуализатор алгоритма Краскала");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(950, 640);
+        setResizable(false);
         setVisible(true);
 
         pane.setPreferredSize(new Dimension(150, 200));
@@ -314,7 +314,7 @@ public class MainWindow extends JFrame
                         graph.clearLastEdge();
                         JOptionPane.showMessageDialog(
                                 this,
-                                "Кажется, что Вы ребро между этими вершинами уже существует",
+                                "Кажется, что ребро между этими вершинами уже существует",
                                 "Сообщение",
                                 JOptionPane.ERROR_MESSAGE
                         );
@@ -347,7 +347,7 @@ public class MainWindow extends JFrame
         if (edged.isSelected()) {
             graph.continueEdge(mouseEvent);
         } else if (vertexes.isSelected()) {
-            graph.moveVertex(mouseEvent.getPoint());
+            graph.moveVertex(mouseEvent);
         }
     }
 
