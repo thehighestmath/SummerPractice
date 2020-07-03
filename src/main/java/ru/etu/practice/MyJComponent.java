@@ -48,6 +48,10 @@ public class MyJComponent extends JComponent {
         return name;
     }
 
+    public void setTuple(List<Object> tuple) {
+        this.tuple = tuple;
+    }
+
     MouseAdapter addVertex = new MouseAdapter() {
         public void mouseClicked(MouseEvent e) {
             name = 'a';
@@ -175,20 +179,20 @@ public class MyJComponent extends JComponent {
         int i = 0;
         int from, to;
         Line2D loop = null;
-        if(tuple != null && tuple.size() == 2 && tuple.get(0) == State.LOOP )
-        {
-            from = ((Edge)tuple.get(1)).from - 'a';
-            to = ((Edge)tuple.get(1)).to - 'a';
-            loop = new Line2D.Double();
-            loop.setLine(vertexes.get(from).getBounds().getCenterX() - RADIUS/2, vertexes.get(to).getBounds().getCenterX() - RADIUS/2,
-                    vertexes.get(from).getBounds().getCenterY() - RADIUS/2,vertexes.get(to).getBounds().getCenterY() - RADIUS/2);
+        if (tuple != null && tuple.size() == 2 && tuple.get(0) == State.LOOP) {
+            from = ((Edge) tuple.get(1)).from - 'a';
+            to = ((Edge) tuple.get(1)).to - 'a';
+            loop = new Line2D.Double(vertexes.get(to).getBounds().getCenterX(),
+                    vertexes.get(to).getBounds().getCenterY(),
+                    vertexes.get(from).getBounds().getCenterX(),
+                    vertexes.get(from).getBounds().getCenterY());
         }
 
         for (Line2D edge : edges) {
-            if(tuple != null && tuple.size() == 2 && tuple.get(0) == State.LOOP &&
-                    (edge.getP1() == loop.getP1() && edge.getP2() == loop.getP2() || edge.getP1() == loop.getP2() && edge.getP1() == loop.getP2())) { //в процессе исправления
+            if (tuple != null && tuple.get(0) == State.LOOP &&
+                    (edge.getP1().equals(loop.getP1()) && edge.getP2().equals(loop.getP2()) || edge.getP1().equals(loop.getP2()) && edge.getP2().equals(loop.getP1())))
                 g2d.setPaint(Color.RED);
-            }else
+            else
                 g2d.setPaint(Color.BLACK);
             g2d.draw(edge);
             if (outEdges.size() > i) {
@@ -209,6 +213,7 @@ public class MyJComponent extends JComponent {
             }
         }
 
+
         // толщина линии
         g2d.setStroke(new BasicStroke(5));
         g2d.setPaint(Color.BLUE);
@@ -217,11 +222,11 @@ public class MyJComponent extends JComponent {
             g2d.draw(edge);
         }
 
-        if(tuple != null && tuple.size() == 2) {
-            if(tuple.get(0) == State.NEW_COMPONENT || tuple.get(0) == State.APPEND) {
+        if (tuple != null && tuple.size() == 2) {
+            if (tuple.get(0) == State.NEW_COMPONENT || tuple.get(0) == State.APPEND) {
                 g2d.setPaint(Color.GREEN);
                 g2d.draw(resultEdges.get(resultEdges.size() - 1));
-            } else if(tuple.get(0) == State.END) {
+            } else if (tuple.get(0) == State.END && resultEdges.size() > 0) {
                 g2d.setPaint(Color.BLUE);
                 g2d.draw(resultEdges.get(resultEdges.size() - 1));
             }
