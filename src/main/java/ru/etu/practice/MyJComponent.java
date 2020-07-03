@@ -66,9 +66,11 @@ public class MyJComponent extends JComponent {
 
             charVertexes.add(name - 'a', name);
 
+            List<Double> xy = getXY(e);
+
             vertex = new Ellipse2D.Double(
-                    e.getPoint().getX() - RADIUS / 2,
-                    e.getPoint().getY() - RADIUS / 2,
+                    xy.get(0) - RADIUS / 2,
+                    xy.get(1) - RADIUS / 2,
                     RADIUS,
                     RADIUS
             );
@@ -85,7 +87,8 @@ public class MyJComponent extends JComponent {
     }
 
     public void continueEdge(MouseEvent e) {
-        edge.setLine(edge.getP1(), e.getPoint());
+        List<Double> xy = getXY(e);
+        edge.setLine(edge.getP1(), new Point2D.Double(xy.get(0), xy.get(1)));
         repaint();
     }
 
@@ -105,7 +108,7 @@ public class MyJComponent extends JComponent {
     }
 
     public void checkCollision() {
-        if (vertex != null)
+        if (vertex != null) {
             for (Ellipse2D anotherVertex : vertexes) {
                 if (!anotherVertex.equals(vertex) && anotherVertex.getBounds2D().intersects(vertex.getBounds2D())
                         || anotherVertex.getBounds().getLocation() == vertex.getBounds().getLocation()) {
@@ -113,6 +116,40 @@ public class MyJComponent extends JComponent {
                     break;
                 }
             }
+            for (Ellipse2D vertex : vertexes) {
+                for (Line2D edge : edges) {
+                    if (!(vertex.getBounds2D().contains(edge.getP1()) || vertex.getBounds2D().contains(edge.getP2()))) {
+                        if (edge.intersects(vertex.getBounds2D())) {
+                            moveVertex(previousPoint);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private List<Double> getXY(MouseEvent event) {
+        List<Double> xy = new LinkedList<>();
+        double x = event.getPoint().getX();
+        double y = event.getPoint().getY();
+
+        if (x < 5 + RADIUS / 2) {
+            x = 5 + RADIUS / 2;
+        } else if (x > 650 - RADIUS / 2) {
+            x = 650 - RADIUS / 2;
+        }
+
+        if (y < 10 + RADIUS / 2) {
+            y = 10 + RADIUS / 2;
+        } else if (y > 530 - RADIUS / 2) {
+            y = 530 - RADIUS / 2;
+        }
+
+        xy.add(x);
+        xy.add(y);
+
+        return xy;
     }
 
     public void freeMovableVertex() {
@@ -144,13 +181,32 @@ public class MyJComponent extends JComponent {
         getMovableEdges(resultEdges);
     }
 
-    public void moveVertex(Point2D mouseEvent) {
+    public void moveVertex(MouseEvent mouseEvent) {
         if (vertex == null)
             return;
+
+        List<Double> xy = getXY(mouseEvent);
+
+        double x = xy.get(0);
+        double y = xy.get(1);
+
         for (Line2D line : movableEdges) {
-            line.setLine(line.getP1(), mouseEvent);
+            line.setLine(line.getP1(), new Point2D.Double(x, y));
         }
-        vertex.setFrame(mouseEvent.getX() - RADIUS / 2, mouseEvent.getY() - RADIUS / 2, RADIUS, RADIUS);
+
+        vertex.setFrame(x - RADIUS / 2, y - RADIUS / 2, RADIUS, RADIUS);
+        repaint();
+    }
+
+    public void moveVertex(Point2D point2D) {
+        if (vertex == null)
+            return;
+
+        for (Line2D line : movableEdges) {
+            line.setLine(line.getP1(), point2D);
+        }
+
+        vertex.setFrame(point2D.getX() - RADIUS / 2, point2D.getY() - RADIUS / 2, RADIUS, RADIUS);
         repaint();
     }
 
@@ -195,22 +251,6 @@ public class MyJComponent extends JComponent {
             else
                 g2d.setPaint(Color.BLACK);
             g2d.draw(edge);
-            if (outEdges.size() > i) {
-                Edge outEdge = outEdges.get(i++);
-                Rectangle2D rectangle2D = new Rectangle2D.Double(
-                        (0.5 * (edge.getX1() + edge.getX2())) - 50 / 2f,
-                        (0.5 * (edge.getY1() + edge.getY2())) - 30 / 2f,
-                        50, 30
-                );
-//                g2d.fill(rectangle2D);
-//                g2d.draw(rectangle2D);
-                g2d.setPaint(Color.RED);
-                g2d.drawString(
-                        String.valueOf(outEdge.distance),
-                        (float) (0.5 * (edge.getX1() + edge.getX2())),
-                        (float) (0.5 * (edge.getY1() + edge.getY2()))
-                );
-            }
         }
 
 
@@ -247,6 +287,18 @@ public class MyJComponent extends JComponent {
             int y = vertex.getBounds().y;
 
             g2d.drawString(String.valueOf(charVertexes.get(vertexes.indexOf(vertex))), x + 15, y + 25);
+        }
+
+        for (Line2D edge : edges) {
+            if (outEdges.size() > i) {
+                Edge outEdge = outEdges.get(i++);
+                g2d.setPaint(Color.RED);
+                g2d.drawString(
+                        String.valueOf(outEdge.distance),
+                        (float) (0.5 * (edge.getX1() + edge.getX2())),
+                        (float) (0.5 * (edge.getY1() + edge.getY2()))
+                );
+            }
         }
     }
 }
