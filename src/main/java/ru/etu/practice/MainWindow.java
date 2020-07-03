@@ -34,10 +34,9 @@ public class MainWindow extends JFrame
 
     MyJComponent graph = new MyJComponent(outEdges, outVertexes);
 
-    JPanel panel = new MyJPanel();
     Container container = getContentPane();
 
-    JPanel grid = new MyJPanel(new GridLayout(3, 2));
+    JPanel grid = new JPanel(new GridLayout(3, 2));
 
     JButton step = new JButton("Следующий шаг");
     JButton allSteps = new JButton("Визуализация");
@@ -112,7 +111,6 @@ public class MainWindow extends JFrame
         type.add(edged);
 //        type.add(clear);
         type.add(delete);
-        panel.setLayout(new BorderLayout());
 
 //        panel.setLayout(new BorderLayout());
 //
