@@ -48,8 +48,8 @@ public class MyJComponent extends JComponent {
         return name;
     }
 
-    public void setTuple(List<Object> tmpTemplate) {
-        tuple = tmpTemplate;
+    public void setTuple(List<Object> tuple) {
+        this.tuple = tuple;
     }
 
     MouseAdapter addVertex = new MouseAdapter() {
@@ -226,7 +226,7 @@ public class MyJComponent extends JComponent {
             if (tuple.get(0) == State.NEW_COMPONENT || tuple.get(0) == State.APPEND) {
                 g2d.setPaint(Color.GREEN);
                 g2d.draw(resultEdges.get(resultEdges.size() - 1));
-            } else if (tuple.get(0) == State.END) {
+            } else if (tuple.get(0) == State.END && resultEdges.size() > 0) {
                 g2d.setPaint(Color.BLUE);
                 g2d.draw(resultEdges.get(resultEdges.size() - 1));
             }
