@@ -387,6 +387,7 @@ public class MainWindow extends JFrame
         if (actionEvent.getSource() == allSteps) {// переписать этот шаг
             if (graphModified) {
                 clearData();
+                graph.setTemplate(null);
             }
             graphStep.initGraph(outEdges, outVertexes);
             addStepInfo(graphStep.kraskal());
@@ -410,42 +411,35 @@ public class MainWindow extends JFrame
             if (graphInitiated) {
                 if (graphModified) {
                     /*
-                    need to delete result and back to start
+                    delete result and back to start
                      */
                     clearData();
                     actionPerformed(actionEvent);
                 } else {
                     /*
-                    do another step
-                    TODO
-                    +требуется добавить метод(задача на третью итерацию), возвращающий рассматриваемое ребро
-                    в метод покраски нужно передавать состояние в которое зашел алгоритм
-                     новая компонента и соединение компонент - зеленый
-                     остовное дерево - синий
-                     цикл - красный
-                     При вызове следующего шага или визуализации, требуется стереть все красные ребра. А зеленые перекрасить в синий
-
-                     +Избавиться от проверки stepID < outEdgesStep.size() и заменить её на проверку State
+                    next step
                      */
                     List<Object> tuple = graphStep.nextStep();
                     addStepInfo(tuple);
-                    System.out.println(stepID);
+                    graph.setTemplate(tuple);
+                    //System.out.println(stepID);
                     if (stepID < outEdgesStep.size()) {
                         Edge edge = outEdgesStep.get(stepID);
                         addLine2d(edge, vertexesStep, this.graph.resultEdges);
                         stepID++;
-                        this.graph.repaint();
                     }
                     if (tuple.get(0) == State.END) {
                         graphModified = true;
-                        addStepInfo("============================");
+                        addStepInfo("===========================");
                     }
+                    graph.repaint();
                 }
             } else {
                 /*
                 init graph and do first step
                  */
                 graphStep.initGraph(outEdges, outVertexes);
+                graph.setTemplate(null);
                 stepID = 0;
                 graphInitiated = true;
                 outEdgesStep = graphStep.getOutputEdges();
