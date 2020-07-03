@@ -21,7 +21,7 @@ public class MainWindow extends JFrame
         return outEdges;
     }
 
-    private final List<Character> outVertexes = new LinkedList<>(); // вершины графа
+    private final List<Character> outVertexes = new LinkedList<>(); //вершины графа
     private final List<Edge> outEdges = new LinkedList<>();
     private char fromVertex;
     private char toVertex;

@@ -221,7 +221,7 @@ public class MyJComponent extends JComponent {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setPaint(Color.BLACK);
 
-        // толщина линии
+        //толщина линии
         g2d.setStroke(new BasicStroke(3));
 
         // размер шрифта
