@@ -10,7 +10,7 @@ import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MyJComponent extends JComponent {
+public class VisualGraph extends JComponent {
     private final static float RADIUS = 40f;
     private final List<Ellipse2D> vertexes = new LinkedList<>();
     private final List<Line2D> edges = new LinkedList<>();
@@ -25,7 +25,7 @@ public class MyJComponent extends JComponent {
     private char name;
     private final List<Character> charVertexes;
 
-    public MyJComponent(List<Edge> edgesList, List<Character> characterList) {
+    public VisualGraph(List<Edge> edgesList, List<Character> characterList) {
         super();
         outEdges = edgesList;
         charVertexes = characterList;
@@ -231,8 +231,8 @@ public class MyJComponent extends JComponent {
         int from, to;
         Line2D loop = null;
         if (tuple != null && tuple.size() == 2 && tuple.get(0) == State.LOOP) {
-            from = ((Edge) tuple.get(1)).from - 'a';
-            to = ((Edge) tuple.get(1)).to - 'a';
+            from = charVertexes.indexOf(((Edge) tuple.get(1)).from);
+            to = charVertexes.indexOf(((Edge) tuple.get(1)).to);
             loop = new Line2D.Double(vertexes.get(to).getBounds().getCenterX(),
                                      vertexes.get(to).getBounds().getCenterY(),
                                      vertexes.get(from).getBounds().getCenterX(),

@@ -32,7 +32,7 @@ public class MainWindow extends JFrame
 
     GridBagConstraints constraints = new GridBagConstraints();
 
-    MyJComponent graph = new MyJComponent(outEdges, outVertexes);
+    VisualGraph graph = new VisualGraph(outEdges, outVertexes);
 
     Container container = getContentPane();
 
