@@ -31,8 +31,8 @@ class Edge {
             return false;
         }
         Edge other = (Edge) o;
-        if (this.to == other.to && this.from == other.from ||
-                this.from == other.to && this.to == other.from
+        if (this.to == other.to && this.from == other.from && this.distance == other.distance ||
+                this.from == other.to && this.to == other.from  && this.distance == other.distance
         ) {
             return true;
         }
@@ -68,6 +68,10 @@ public class Graph {
     public void initGraph(List<Edge> inputEdges, List<Character> inputVertices) {
         this.inputEdges = new LinkedList<>(inputEdges);
         this.inputVertices = new HashSet<>(inputVertices);
+    }
+
+    public List<Edge> getInputEdges() {
+        return inputEdges;
     }
 
     public void readGraph() {
