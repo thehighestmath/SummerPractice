@@ -3,6 +3,11 @@ package ru.etu.practice;
 import java.util.*;
 
 class Edge {
+    @Override
+    public String toString() {
+        return "Edge " + " " + from + "-" + to;
+    }
+
     /**
      * way from -> to == way to -> to
      */
@@ -16,31 +21,60 @@ class Edge {
         this.distance = distance;
 
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        Edge other = (Edge) o;
+        return this.to == other.to && this.from == other.from && this.distance == other.distance||
+                this.from == other.to && this.to == other.from && this.distance == other.distance;
+    }
 }
 
 public class Graph {
     private static final int SIZE = 26;
 
-    private int countVertexes;
+    private int i = -1;
+    private int value = 0;
 
     private final int[][] inputGraph;
-    private final int[][] outputGraph;
 
-
-    private final List<Edge> inputEdges;
+    private List<Edge> inputEdges;
     private final List<Edge> outputEdges;
 
-    private final Set<Character> inputVertices;
+    private Set<Character> inputVertices;
     private final List<Set<Character>> outputVertices;
 
+    public List<Edge> getInputEdges() {
+        return inputEdges;
+    }
+
+    public Set<Character> getInputVertices() {
+        return inputVertices;
+    }
 
     public Graph() {
         inputGraph = new int[SIZE][SIZE];
-        outputGraph = new int[SIZE][SIZE];
         inputEdges = new LinkedList<>();
         outputEdges = new LinkedList<>();
         inputVertices = new HashSet<>();
         outputVertices = new LinkedList<>();
+    }
+
+    public void initGraph(List<Edge> inputEdges, List<Character> inputVertices) {
+        this.inputEdges = new LinkedList<>(inputEdges);
+        this.inputVertices = new HashSet<>(inputVertices);
+        sortEdges();
     }
 
     public void readGraph() {
@@ -80,7 +114,6 @@ public class Graph {
                 inputGraph[to - 'a'][from - 'a'] = distance;
             }
         }
-        countVertexes = inputVertices.size();
     }
 
     public void printGraph() {
@@ -116,23 +149,61 @@ public class Graph {
         System.err.println(State.SORT);
     }
 
-    private State nextStep(Edge edge) {
-        State state = null;
+    public List<Edge> getOutputEdges() {
+        return outputEdges;
+    }
+
+    /**
+     * tuple.get(0) instanceof State -- return state
+     * tuple.get(1) instanceof Edge -- added edge
+     *
+     * @return tuple
+     */
+    public List<Object> nextStep() {
+        List<Object> tuple = new LinkedList<>();
+        if (i == -1) {
+            sortEdges();
+            i++;
+            tuple.add(State.SORT);
+            return tuple;
+        }
+        if (i >= inputEdges.size()) {
+            tuple.add(State.END);
+            tuple.add(value);
+            i = -1;
+            return tuple;
+        }
+
+        Edge edge = inputEdges.get(i++);
+        value += edge.distance;
         Set<Character> tempVertexes = new HashSet<>();
         Character vertex1 = edge.from;
         Character vertex2 = edge.to;
         tempVertexes.add(vertex1);
         tempVertexes.add(vertex2);
 
+        if (outputVertices.size() > 0) {
+            if (outputVertices.get(0).size() == inputVertices.size()) {
+                tuple.add(State.END);
+                value -= edge.distance;
+                tuple.add(value);
+                return tuple;
+            }
+        }
+
         boolean hasFound = false;
         for (Set<Character> currently : outputVertices) {
             if (isOld(currently, tempVertexes)) {
-                return State.LOOP;
+                tuple.add(State.LOOP);
+                tuple.add(edge);
+                value -= edge.distance;
+                return tuple;
             }
             if (isCommon(currently, tempVertexes)) {
                 hasFound = true;
                 currently.addAll(tempVertexes);
-                state = State.APPEND;
+                tuple.add(State.APPEND);
+                tuple.add(edge);
             }
         }
 
@@ -141,7 +212,8 @@ public class Graph {
                 Set<Character> first = outputVertices.get(i);
                 Set<Character> second = outputVertices.get(j);
                 if (isCommon(first, second)) {
-                    state = State.CONNECT_COMPONENTS;
+                    tuple.add(State.CONNECT_COMPONENTS);
+                    tuple.add(edge);
                     first.addAll(second);
                     second.clear();
                 }
@@ -150,24 +222,63 @@ public class Graph {
 
         outputEdges.add(edge);
         if (!hasFound) {
-            state = State.NEW_COMPONENT;
+            tuple.add(State.NEW_COMPONENT);
+            tuple.add(edge);
             outputVertices.add(tempVertexes);
         }
-        if (outputVertices.get(0).size() == countVertexes) {
-            state = State.END;
-        }
+//        if (outputVertices.get(0).size() == inputVertices.size()) {
+//            tuple.add(State.END);
+//            value -= edge.distance;
+//            tuple.add(value);
+//            return tuple;
+//        }
 //        assert state != null;
-        return state;
+        return tuple;
     }
 
-    public void kraskal() {
-        for (Edge edge : inputEdges) {
-            State state = nextStep(edge);
-            System.err.println(state);
-            if (state == State.END) {
+    public String kraskal() {
+        i = -1;
+        StringBuilder result = new StringBuilder();
+        while (true) {
+            List<Object> tuple = nextStep();
+            result.append(addStepInfo(tuple));
+            System.err.println(tuple.get(0));
+            if (tuple.get(0) == State.END) {
                 break;
             }
         }
+        result.append("==========================");
+        return result.toString();
+    }
+
+    public static String addStepInfo(List<Object> tuple) {
+        State state = (State) tuple.get(0);
+        StringBuilder addText = new StringBuilder();
+        if (state == State.SORT) {
+            addText.append(state);
+        } else if (state == State.END) {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append("\n");
+            int value = (int) tuple.get(1);
+            addText.append("Minimum spanning tree weight is ");
+            addText.append(value);
+        } else if (state == State.LOOP) {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append(" | ");
+            Edge edge = (Edge) tuple.get(1);
+            addText.append(edge);
+            addText.append(" will not be added");
+        } else {
+            assert tuple.size() > 1;
+            addText.append(state);
+            addText.append(" | ");
+            Edge edge = (Edge) tuple.get(1);
+            addText.append(edge);
+            addText.append(" added");
+        }
+        return addText.toString() + "\n";
     }
 
     private boolean isCommon(Set<Character> first, Set<Character> second) {
@@ -192,6 +303,13 @@ public class Graph {
             }
             System.out.println();
         }
+    }
+
+    public void clearOutput() {
+        outputEdges.clear();
+        outputVertices.clear();
+        i = -1;
+        value = 0;
     }
 
     public void printInputEdges() {

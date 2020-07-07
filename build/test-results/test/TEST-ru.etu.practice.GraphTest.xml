@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ru.etu.practice.GraphTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2020-07-07T15:49:52" hostname="DESKTOP-OT1BQTM" time="0.064">
+  <properties/>
+  <testcase name="kraskalGraphOf13Edges()" classname="ru.etu.practice.GraphTest" time="0.023"/>
+  <testcase name="sort4Edges()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="notEqualsAbAndNull()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="sort8Edges()" classname="ru.etu.practice.GraphTest" time="0.006"/>
+  <testcase name="firstNextStep()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="loopNextStep()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="endNextStep()" classname="ru.etu.practice.GraphTest" time="0.002"/>
+  <testcase name="newComponentNextStep()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="kraskalOfEmptyGraph()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="equalsAbAb()" classname="ru.etu.practice.GraphTest" time="0.002"/>
+  <testcase name="equalsAbBa()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="kraskalGraphOf40Edges()" classname="ru.etu.practice.GraphTest" time="0.005"/>
+  <testcase name="appendNextStep()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="notEqualsAb3Ab4()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <testcase name="kraskalGraphOf3Edges()" classname="ru.etu.practice.GraphTest" time="0.002"/>
+  <testcase name="kraskalGraphOf7Edges()" classname="ru.etu.practice.GraphTest" time="0.004"/>
+  <testcase name="kraskalGraphOf8Edges()" classname="ru.etu.practice.GraphTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[SORT
+SORT
+SORT
+NEW_COMPONENT
+NEW_COMPONENT
+NEW_COMPONENT
+APPEND
+LOOP
+APPEND
+APPEND
+APPEND
+LOOP
+LOOP
+APPEND
+LOOP
+APPEND
+END
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+END
+SORT
+SORT
+SORT
+SORT
+NEW_COMPONENT
+NEW_COMPONENT
+APPEND
+APPEND
+NEW_COMPONENT
+APPEND
+APPEND
+APPEND
+APPEND
+APPEND
+APPEND
+APPEND
+LOOP
+NEW_COMPONENT
+APPEND
+APPEND
+APPEND
+LOOP
+LOOP
+LOOP
+LOOP
+APPEND
+APPEND
+APPEND
+APPEND
+APPEND
+APPEND
+LOOP
+LOOP
+LOOP
+LOOP
+APPEND
+LOOP
+LOOP
+APPEND
+LOOP
+APPEND
+END
+SORT
+SORT
+SORT
+SORT
+SORT
+SORT
+NEW_COMPONENT
+APPEND
+END
+SORT
+SORT
+SORT
+SORT
+NEW_COMPONENT
+NEW_COMPONENT
+APPEND
+APPEND
+APPEND
+LOOP
+APPEND
+END
+SORT
+SORT
+SORT
+SORT
+NEW_COMPONENT
+APPEND
+APPEND
+LOOP
+LOOP
+LOOP
+APPEND
+END
+SORT
+]]></system-err>
+</testsuite>
