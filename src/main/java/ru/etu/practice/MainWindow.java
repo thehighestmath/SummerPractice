@@ -13,7 +13,7 @@ import java.util.List;
 public class MainWindow extends JFrame
         implements MouseListener, MouseMotionListener, ItemListener, ActionListener {
 
-    public List<Character> getOutVertexes() {
+    public List<Node> getOutVertexes() {
         return outVertexes;
     }
 
@@ -21,10 +21,10 @@ public class MainWindow extends JFrame
         return outEdges;
     }
 
-    private final List<Character> outVertexes = new LinkedList<>(); // вершины графа
+    private final List<Node> outVertexes = new LinkedList<>(); // вершины графа
     private final List<Edge> outEdges = new LinkedList<>();
-    private char fromVertex;
-    private char toVertex;
+    private Node fromVertex;
+    private Node toVertex;
     private boolean graphInitiated = false;
     private boolean graphModified = false;
 
@@ -52,7 +52,7 @@ public class MainWindow extends JFrame
     JScrollPane pane = new JScrollPane(textArea);
 
     Graph graphStep = new Graph();
-    List<Edge> outEdgesStep = graphStep.getOutputEdges();
+//    List<Edge> outEdgesStep = graphStep.getOutputEdges();
     List<Ellipse2D> vertexesStep = graph.getVertexes();
     int stepID = 0;
 
@@ -165,7 +165,7 @@ public class MainWindow extends JFrame
                 graph.addVertex.mouseClicked(mouseEvent);
                 char vertexChar = graph.getLastAddedVertex();
                 if (vertexChar <= 'z') {
-                    outVertexes.add(vertexChar);
+                    outVertexes.add(new Node(vertexChar));
                     graphModified = true;
                 }
             }
@@ -174,15 +174,15 @@ public class MainWindow extends JFrame
         } else if (delete.isSelected()) {
             for (Ellipse2D vertex : graph.getVertexes()) {
                 if (vertex.contains(mouseEvent.getPoint())) {
-                    final char cr = outVertexes.get(graph.getVertexes().indexOf(vertex));
-                    outVertexes.remove(graph.getVertexes().indexOf(vertex));
-                    graph.getEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
-                    outEdges.removeIf(elem -> elem.from == cr || elem.to == cr);
-                    graph.getResultEdgesEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
-                    graphStep.getOutputEdges().removeIf(elem -> elem.from == cr || elem.to == cr);
-                    graph.getVertexes().remove(vertex);
-                    graphModified = true;
-                    repaint();
+//                    final char cr = outVertexes.get(graph.getVertexes().indexOf(vertex));
+//                    outVertexes.remove(graph.getVertexes().indexOf(vertex));
+//                    graph.getEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
+//                    outEdges.removeIf(elem -> elem.from == cr || elem.to == cr);
+//                    graph.getResultEdgesEdges().removeIf(elem -> vertex.contains(elem.getP1()) || vertex.contains(elem.getP2()));
+//                    graphStep.getOutputEdges().removeIf(elem -> elem.from == cr || elem.to == cr);
+//                    graph.getVertexes().remove(vertex);
+//                    graphModified = true;
+//                    repaint();
                     break;
                 }
             }
@@ -224,7 +224,7 @@ public class MainWindow extends JFrame
                             vertex.getBounds().getCenterX(),
                             vertex.getBounds().getCenterY()
                     );
-                    fromVertex = outVertexes.get(vertexes.indexOf(vertex));
+//                    fromVertex = outVertexes.get(vertexes.indexOf(vertex));
                     break;
                 }
             }
@@ -374,7 +374,7 @@ public class MainWindow extends JFrame
         stepID = 0;
         graphInitiated = false;
         graphModified = false;
-        graphStep.clearOutput();
+//        graphStep.clearOutput();
         graph.clearResult();
         addStepInfo(String.valueOf(State.CLEAR));
         addStepInfo("===============");
@@ -389,10 +389,12 @@ public class MainWindow extends JFrame
             }
 
             graphStep.initGraph(outEdges, outVertexes);
-            addStepInfo(graphStep.kraskal());
-            List<Object> tuple = graphStep.nextStep() ;
-            graph.setTuple(tuple);
-            List<Edge> outEdges = graphStep.getOutputEdges();
+            Kruskal kruskal = new Kruskal(graphStep);
+            addStepInfo(kruskal.kruskal());
+//            addStepInfo(graphStep.kruskal());
+//            List<Object> tuple = graphStep.nextStep() ;
+//            graph.setTuple(tuple);
+            List<Edge> outEdges = kruskal.getOutputEdges();
             List<Ellipse2D> vertexes = this.graph.getVertexes();
             List<Line2D> lines2D = new LinkedList<>();
             for (Edge edge : outEdges) {
@@ -407,7 +409,7 @@ public class MainWindow extends JFrame
             clearData();
             outEdges.clear();
             outVertexes.clear();
-            outEdgesStep.clear();
+//            outEdgesStep.clear();
         } else if (actionEvent.getSource() == step) {
             if (graphInitiated) {
                 if (graphModified) {
@@ -420,20 +422,20 @@ public class MainWindow extends JFrame
                     /*
                     next step
                      */
-                    List<Object> tuple = graphStep.nextStep();
-                    addStepInfo(tuple);
-                    graph.setTuple(tuple);
+//                    List<Object> tuple = graphStep.nextStep();
+//                    addStepInfo(tuple);
+//                    graph.setTuple(tuple);
                     //System.out.println(stepID);
-                    if (stepID < outEdgesStep.size()) {
-                        Edge edge = outEdgesStep.get(stepID);
-                        addLine2d(edge, vertexesStep, this.graph.resultEdges);
-                        stepID++;
-                    }
-                    if (tuple.get(0) == State.END) {
-                        graphModified = true;
-                        addStepInfo("===========================");
-                    }
-                    graph.repaint();
+//                    if (stepID < outEdgesStep.size()) {
+//                        Edge edge = outEdgesStep.get(stepID);
+//                        addLine2d(edge, vertexesStep, this.graph.resultEdges);
+//                        stepID++;
+//                    }
+//                    if (tuple.get(0) == State.END) {
+//                        graphModified = true;
+//                        addStepInfo("===========================");
+//                    }
+//                    graph.repaint();
                 }
             } else {
                 /*
@@ -443,7 +445,7 @@ public class MainWindow extends JFrame
                 graph.setTuple(null);
                 stepID = 0;
                 graphInitiated = true;
-                outEdgesStep = graphStep.getOutputEdges();
+//                outEdgesStep = graphStep.getOutputEdges();
                 vertexesStep = graph.getVertexes();
                 actionPerformed(actionEvent);
             }
@@ -453,8 +455,8 @@ public class MainWindow extends JFrame
     }
 
     private void addLine2d(Edge edge, List<Ellipse2D> vertexes, List<Line2D> lines2D) {
-        char from = edge.from;
-        char to = edge.to;
+        Node from = edge.from;
+        Node to = edge.to;
         double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
         for (Ellipse2D vertex : vertexes) {
             Rectangle2D rectangle2D = vertex.getBounds2D();
@@ -477,7 +479,7 @@ public class MainWindow extends JFrame
     }
 
     private void addStepInfo(List<Object> tuple) {
-        textArea.setText(textArea.getText() + Graph.addStepInfo(tuple));
+        textArea.setText(textArea.getText() + Kruskal.addStepInfo(tuple));
     }
 
     private void addStepInfo(String msg) {

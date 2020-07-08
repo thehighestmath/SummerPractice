@@ -23,9 +23,9 @@ public class VisualGraph extends JComponent {
     private List<Edge> outEdges;
     private List<Object> tuple;
     private char name;
-    private final List<Character> charVertexes;
+    private final List<Node> charVertexes;
 
-    public VisualGraph(List<Edge> edgesList, List<Character> characterList) {
+    public VisualGraph(List<Edge> edgesList, List<Node> characterList) {
         super();
         outEdges = edgesList;
         charVertexes = characterList;
@@ -54,8 +54,8 @@ public class VisualGraph extends JComponent {
     MouseAdapter addVertex = new MouseAdapter() {
         public void mouseClicked(MouseEvent e) {
             name = 'a';
-            for (char tmpChar : charVertexes) {
-                if (name != tmpChar) break;
+            for (Node tmpChar : charVertexes) {
+                if (name != tmpChar.getName()) break;
                 else name++;
             }
 
@@ -63,7 +63,7 @@ public class VisualGraph extends JComponent {
                 return;
             }
 
-            charVertexes.add(name - 'a', name);
+            charVertexes.add(name - 'a', new Node(name));
             List<Double> xy = getXY(e);
 
             vertex = new Ellipse2D.Double(
