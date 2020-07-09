@@ -13,7 +13,7 @@ public class Kruskal {
     }
 
     private List<Edge> inputEdges;
-    private final List<Node> inputVertices;
+    private List<Node> inputVertices;
     private final List<Edge> outputEdges;
     private final List<Set<Node>> outputVertices;
 
@@ -25,6 +25,12 @@ public class Kruskal {
         inputVertices = graph.getInputVertices();
         outputEdges = new LinkedList<>();
         outputVertices = new LinkedList<>();
+    }
+
+    public void initKruskal(List<Edge> inputEdges, List<Node> inputVertices) {
+        this.inputEdges = inputEdges;
+        this.inputVertices = inputVertices;
+        this.graph.initGraph(inputEdges, inputVertices);
     }
 
     public void sortEdges() {

@@ -24,10 +24,10 @@ public class Graph {
         this.inputVertices = new LinkedList<>();
     }
 
-//    public void initGraph(List<Edge> inputEdges, List<Node> inputVertices) {
-//        this.inputEdges = new LinkedList<>(inputEdges);
-//        this.inputVertices = new LinkedList<>(inputVertices);
-//    }
+    public void initGraph(List<Edge> inputEdges, List<Node> inputVertices) {
+        this.inputEdges = new LinkedList<>(inputEdges);
+        this.inputVertices = new LinkedList<>(inputVertices);
+    }
 
     public void addEdge(Node from, Node to, int distance) {
         Edge newEdge = new Edge(from, to, distance);
