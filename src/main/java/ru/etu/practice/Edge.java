@@ -3,7 +3,7 @@ package ru.etu.practice;
 public class Edge {
     @Override
     public String toString() {
-        return "Edge " + " " + from + "—" + to + " " + distance + '\n';
+        return "Edge " + " " + from + "—" + to + " " + distance;
     }
 
     /**

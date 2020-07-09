@@ -5,28 +5,30 @@ import java.util.*;
 public class Kruskal {
 
     private final Graph graph;
-    private int i = -1;
-    private int value = 0;
+    private int stepID = -1;
+    private int weight = 0;
 
     public List<Edge> getInputEdges() {
         return inputEdges;
     }
 
-    private final List<Edge> inputEdges;
+    private List<Edge> inputEdges;
     private final List<Node> inputVertices;
     private final List<Edge> outputEdges;
     private final List<Set<Node>> outputVertices;
 
+    public boolean isStarted = false;
 
-    public Kruskal(Graph graph){
-        this.graph = graph;
+    public Kruskal() {
+        this.graph = new Graph();
         inputEdges = new LinkedList<>(graph.getInputEdges());
-        inputVertices = new LinkedList<>(graph.getInputVertices());
+        inputVertices = graph.getInputVertices();
         outputEdges = new LinkedList<>();
         outputVertices = new LinkedList<>();
     }
 
     public void sortEdges() {
+        inputEdges = new LinkedList<>(graph.getInputEdges());
         inputEdges.sort(new Comparator<Edge>() {
             @Override
             public int compare(Edge edge1, Edge edge2) {
@@ -41,6 +43,14 @@ public class Kruskal {
         return outputEdges;
     }
 
+    public List<Node> getInputVertices() {
+        return inputVertices;
+    }
+
+    public Graph getGraph() {
+        return graph;
+    }
+
     /**
      * tuple.get(0) instanceof State -- return state
      * tuple.get(1) instanceof Edge -- added edge
@@ -49,21 +59,26 @@ public class Kruskal {
      */
     public List<Object> nextStep() {
         List<Object> tuple = new LinkedList<>();
-        if (i == -1) {
+        if (stepID == -1 || !isStarted) {
+            isStarted = true;
+            graph.isModified = false;
             sortEdges();
-            i++;
+            stepID++;
             tuple.add(State.SORT);
             return tuple;
         }
-        if (i >= inputEdges.size()) {
+
+        if (stepID >= inputEdges.size() || graph.isModified) {
+            isStarted = false;
             tuple.add(State.END);
-            tuple.add(value);
-            i = -1;
+            tuple.add(weight);
+            stepID = -1;
+            graph.isModified = true;
             return tuple;
         }
 
-        Edge edge = inputEdges.get(i++);
-        value += edge.distance;
+        Edge edge = inputEdges.get(stepID++);
+        weight += edge.distance;
         Set<Node> tempVertexes = new HashSet<>();
         Node vertex1 = edge.from;
         Node vertex2 = edge.to;
@@ -71,10 +86,12 @@ public class Kruskal {
         tempVertexes.add(vertex2);
 
         if (outputVertices.size() > 0) {
-            if (outputVertices.get(0).size() == inputEdges.size()) {
+            if (outputVertices.get(0).size() == inputVertices.size()) {
                 tuple.add(State.END);
-                value -= edge.distance;
-                tuple.add(value);
+                weight -= edge.distance;
+                tuple.add(weight);
+                stepID = -1;
+                graph.isModified = true;
                 return tuple;
             }
         }
@@ -84,7 +101,7 @@ public class Kruskal {
             if (isOld(currently, tempVertexes)) {
                 tuple.add(State.LOOP);
                 tuple.add(edge);
-                value -= edge.distance;
+                weight -= edge.distance;
                 return tuple;
             }
             if (isCommon(currently, tempVertexes)) {
@@ -118,13 +135,14 @@ public class Kruskal {
     }
 
     public String kruskal() {
-        i = -1;
+        stepID = -1;
         StringBuilder result = new StringBuilder();
         while (true) {
             List<Object> tuple = nextStep();
             result.append(addStepInfo(tuple));
-            System.err.println(tuple.get(0));
+            //System.err.println(tuple.get(0));
             if (tuple.get(0) == State.END) {
+                graph.isModified = true;
                 break;
             }
         }
@@ -179,7 +197,14 @@ public class Kruskal {
     public void clearOutput() {
         outputEdges.clear();
         outputVertices.clear();
-        i = -1;
-        value = 0;
+        stepID = -1;
+        weight = 0;
+    }
+
+    public void clear() {
+        clearOutput();
+        inputVertices.clear();
+        inputEdges.clear();
+        graph.clear();
     }
 }
